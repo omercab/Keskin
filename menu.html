@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keskin — Ekşi Mayalı Pide, Alaçatı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F7F1E4;
+    --panel:#EFE1C6;
+    --charcoal:#332720;
+    --ink:#4A392E;
+    --terracotta:#C1502E;
+    --line: rgba(51,39,32,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--charcoal);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+  }
+
+  /* woven diamond border strip — echoes the printed menu's frame */
+  .weave{
+    height:14px;
+    width:100%;
+    background-image:
+      linear-gradient(45deg, var(--charcoal) 25%, transparent 25%, transparent 75%, var(--charcoal) 75%),
+      linear-gradient(45deg, var(--charcoal) 25%, transparent 25%, transparent 75%, var(--charcoal) 75%);
+    background-size:14px 14px;
+    background-position:0 0, 7px 7px;
+    background-color:var(--cream);
+    opacity:0.9;
+  }
+
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:0 22px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    text-align:center;
+    padding:48px 0 30px;
+  }
+  .hero .brand{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(48px, 14vw, 72px);
+    letter-spacing:0.5px;
+    margin:0;
+    color:var(--charcoal);
+  }
+  .hero .brand .dot-i{ position:relative; }
+  .hero .tagline{
+    font-family:'Space Mono', monospace;
+    text-transform:uppercase;
+    letter-spacing:3px;
+    font-size:12.5px;
+    color:var(--terracotta);
+    margin:10px 0 2px;
+  }
+  .hero .place{
+    font-family:'Space Mono', monospace;
+    text-transform:uppercase;
+    letter-spacing:4px;
+    font-size:11px;
+    color:var(--ink);
+    opacity:0.75;
+  }
+
+  .diamond-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    margin:26px 0;
+  }
+  .diamond-divider .rule{
+    height:1px;
+    width:56px;
+    background:var(--line);
+  }
+  .diamond-divider .gem{
+    width:11px;height:11px;
+    background:var(--terracotta);
+    transform:rotate(45deg);
+    border-radius:2px;
+    flex-shrink:0;
+  }
+
+  /* ---------- CHEF'S NOTE ---------- */
+  .chefs-note{
+    text-align:center;
+    padding:2px 6px 8px;
+  }
+  .chefs-note h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:18px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin:0 0 10px;
+  }
+  .chefs-note p{
+    margin:4px 0;
+    font-size:14.5px;
+    color:var(--ink);
+  }
+  .chefs-note p.sub{
+    font-size:13px;
+    opacity:0.75;
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  section{
+    margin:34px 0;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    border-bottom:1.5px solid var(--charcoal);
+    padding-bottom:8px;
+    margin-bottom:16px;
+  }
+  .section-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:19px;
+    letter-spacing:0.3px;
+    margin:0;
+    text-transform:uppercase;
+  }
+
+  .pide-hero{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:clamp(44px, 16vw, 64px);
+    text-align:center;
+    margin:8px 0 26px;
+    color:var(--terracotta);
+  }
+
+  /* ---------- DISH ITEMS ---------- */
+  .dish{
+    margin:0 0 14px;
+  }
+  .dish .name{
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.2px;
+  }
+  .dish .desc{
+    font-size:13.5px;
+    color:var(--ink);
+    opacity:0.85;
+    margin-top:2px;
+  }
+  .simple-list .dish{
+    margin-bottom:9px;
+  }
+  .simple-list .name{
+    font-weight:500;
+    font-size:14.5px;
+  }
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:0 40px;
+  }
+  @media(min-width:560px){
+    .two-col{ grid-template-columns:1fr 1fr; }
+  }
+
+  .note{
+    font-size:12px;
+    color:var(--terracotta);
+    margin-top:6px;
+  }
+
+  /* ---------- AYIN SOFRASINDA panel ---------- */
+  .panel{
+    border:1.5px solid var(--charcoal);
+    border-radius:2px;
+    padding:20px 20px 8px;
+    margin-top:28px;
+  }
+  .panel h3{
+    font-family:'Fraunces', serif;
+    font-size:16px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin:0 0 14px;
+  }
+  .week{
+    display:flex;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .week .tag{
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:1px;
+    color:var(--terracotta);
+    white-space:nowrap;
+    padding-top:2px;
+  }
+  .week .desc{ font-size:13.5px; }
+
+  /* ---------- tatlı panel ---------- */
+  .sweet-panel{
+    background:var(--panel);
+    border-radius:2px;
+    padding:24px 20px;
+    margin-top:8px;
+  }
+  .sweet-panel .section-head{ border-color:var(--charcoal); }
+  .footnote{
+    font-size:12px;
+    color:var(--ink);
+    opacity:0.8;
+    margin-top:16px;
+    line-height:1.6;
+  }
+
+  /* ---------- STORY ---------- */
+  .story{
+    margin:48px 0 10px;
+    text-align:center;
+  }
+  .story .brand-small{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:30px;
+  }
+  .story .brand-tag{
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--terracotta);
+    margin-top:4px;
+  }
+  .story .names{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin:22px 0 6px;
+    opacity:0.7;
+  }
+  .story p{
+    font-size:14.5px;
+    color:var(--ink);
+    text-align:left;
+    margin:16px 0;
+  }
+  .story .sign{
+    font-family:'Caveat', cursive;
+    font-size:32px;
+    margin-top:18px;
+    color:var(--charcoal);
+  }
+
+  footer{
+    text-align:center;
+    padding:36px 0 24px;
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    opacity:0.55;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    section, .hero, .story{
+      animation:rise 0.5s ease both;
+    }
+  }
+  @keyframes rise{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+</style>
+</head>
+<body>
+
+<div class="weave"></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <p class="brand">KESKİN</p>
+    <p class="tagline">Ekşi Mayalı Pide</p>
+    <p class="place">Alaçatı</p>
+  </div>
+
+  <div class="chefs-note">
+    <h2>Şefin İkramı</h2>
+    <p>Soka, yanık tereyağı, lavaş, Alaçatı yeşilleri</p>
+    <p class="sub">Alaçatı pazarı ve odun fırınımızdan.</p>
+  </div>
+
+  <div class="diamond-divider"><span class="rule"></span><span class="gem"></span><span class="rule"></span></div>
+
+  <div class="two-col">
+    <section>
+      <div class="section-head"><h2>Gün Boyu Çorba</h2></div>
+      <div class="simple-list">
+        <div class="dish"><div class="name">Taşfırından Köz Patlıcan</div></div>
+        <div class="dish"><div class="name">Klasik Usûl Mercimek</div></div>
+        <div class="dish"><div class="name">Yaz Çorbası</div><div class="desc">Soğuk servis edilir.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Pide'den Önce</h2></div>
+      <div class="simple-list">
+        <div class="dish"><div class="name">Tava Yoğurt Kale Biberi</div></div>
+        <div class="dish"><div class="name">Humus Ege</div></div>
+        <div class="dish"><div class="name">Bostan Salatası</div></div>
+        <div class="dish"><div class="name">Çubuk Turşu</div></div>
+        <div class="dish"><div class="name">Muhammara</div></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="pide-hero">Pide</div>
+
+  <section>
+    <div class="section-head"><h2>Şef Spesiyal Pideleri</h2></div>
+    <div class="dish"><div class="name">Öteki Yaka Pide</div><div class="desc">Saganaki, mastela, feta peyniri Dimitri'den.</div></div>
+    <div class="dish"><div class="name">Köz Patlıcanlı Pide</div><div class="desc">Muharrem amcanın tarladan.</div></div>
+    <div class="dish"><div class="name">Sakatat <span style="font-weight:400;opacity:0.7;">(Kürekçinin Tavsiyesi)</span></div><div class="desc">Karamelize Ovacık soğan, mantar, peynir, dana dil, maydanoz, soğan sumak.</div></div>
+    <div class="dish"><div class="name">Alaçatı Çıtırı</div><div class="desc">Kabak çiçeği, fesleğen, Girit kabağı, çam fıstığı, peynir.</div></div>
+    <div class="dish"><div class="name">Bardacık İncirli Pide</div><div class="desc">Küflü peynir, Alaçatı kekik balı, yerli bardacık inciri, kuru Boşnak eti.</div></div>
+    <p class="note">** Gluten intoleransı için servis personeline danışınız.</p>
+    <p class="note">** Gıda alerjisi varsa lütfen belirtiniz.</p>
+  </section>
+
+  <div class="panel">
+    <h3>Ayın Sofrasında</h3>
+    <div class="week"><span class="tag">1. HAFTA</span><span class="desc">Kuzu incik, suyuna firik bulguru.</span></div>
+    <div class="week"><span class="tag">2. HAFTA</span><span class="desc">Közde köfte, domatesli reyhanlı pirinç pilavı.</span></div>
+    <div class="week"><span class="tag">3. HAFTA</span><span class="desc">Çökertme kebabı.</span></div>
+    <div class="week"><span class="tag">4. HAFTA</span><span class="desc">Şişte satır kıyması Ali Nazik.</span></div>
+  </div>
+
+  <section>
+    <div class="section-head"><h2>Klasikler</h2></div>
+    <div class="dish"><div class="name">Lahmacun</div><div class="desc">Ovacık domates, yerli çarliston biber, maydanoz, yerli soğan.</div></div>
+    <div class="dish"><div class="name">Kıymalı Pide</div><div class="desc">Dana kıyma, Ovacık domates, çarliston biber, yerli soğan, maydanoz.</div></div>
+    <div class="dish"><div class="name">Kuşbaşılı Pide</div><div class="desc">Dana antrikot, Ovacık domates, yerli çarliston biber.</div></div>
+    <div class="dish"><div class="name">Tire Sucuklu Pide</div><div class="desc">Göbek kaşar peyniri, Tire sucuk, domates.</div></div>
+    <div class="dish"><div class="name">Pastırmalı</div><div class="desc">Eski kaşar Kars'tan ev yapımı pastırma.</div></div>
+    <div class="dish"><div class="name">Ege Yeşili</div><div class="desc">Alaçatı otları, Bergama tulum ve Ezine peyniri ham çökelek, kaymak.</div></div>
+    <div class="dish"><div class="name">Tadım</div><div class="desc">Mini 3'lü — kıymalı, kuşbaşılı, Ege yeşili.</div></div>
+    <p class="note" style="color:var(--ink);opacity:0.8;">İlaveler: Peynir, Kümes Yumurtası</p>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Yerel / Özel İçecekler</h2></div>
+    <div class="two-col">
+      <div class="simple-list">
+        <div class="dish"><div class="name">Ayran</div></div>
+        <div class="dish"><div class="name">Acılı Ayran</div></div>
+        <div class="dish"><div class="name">Ali Göde Şalgam</div></div>
+      </div>
+      <div class="simple-list">
+        <div class="dish"><div class="name">Limonata</div></div>
+        <div class="dish"><div class="name">Yerli Gazoz</div></div>
+        <div class="dish"><div class="name">Kola · Fanta · Soda</div></div>
+        <div class="dish"><div class="name">Tamek Meyve Suları</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sweet-panel">
+    <div class="section-head"><h2>Pide'den Sonra Tatlı Son</h2></div>
+    <div class="dish"><div class="name">Yerli Susam Tahinli Pide</div><div class="desc">Manda kaymaklı, Antep fıstıklı.</div></div>
+    <div class="dish"><div class="name">Fındık Krokanlı Taş Fırında Sütlaç</div><div class="desc">Jersey süt ile.</div></div>
+    <div class="dish"><div class="name">Bugünün Tatlısı</div></div>
+    <p class="footnote">*** Menümüzdeki lezzetler günlük ve sınırlı sayıda hazırlanmaktadır. Bazı ürünler gün içinde tükenebilir.<br>Anlayışınız için teşekkür ederiz.</p>
+  </div>
+
+  <div class="diamond-divider" style="margin-top:44px;"><span class="rule"></span><span class="gem"></span><span class="rule"></span></div>
+
+  <div class="story">
+    <p class="brand-small">KESKİN</p>
+    <p class="brand-tag">Ekşi Mayalı Pide · Alaçatı</p>
+    <p class="names">Fehim · Bora · Hüseyin</p>
+    <p>Sevgili herkes;</p>
+    <p>Alaçatı'nın dost sofralarında başlayan arkadaşlığımızı en sevdiğimiz lezzetlerden biri olan pide ile buluşturmaya karar verdik. Ekşimayalı hamurumuzu özenle hazırlıyor, taş fırınımızda zeytin ve meşe odunuyla pişiriyoruz. Bizim için lezzet yalnızca kullanılan malzemelerde değil; emeğin, samimiyetin ve paylaşmanın içinde saklıdır. Biraz güneşin, biraz toprağın, birazda Alaçatı rüzgarının etkisiyle.</p>
+    <p>Bugün soframıza oturan herkes hikayenin bir parçasıdır. Hafızamızdaki anıları yaşatmak niyetiyle, toprağın bereketiyle, Alaçatı'nın ruhuyla...</p>
+    <p style="text-align:center;">Afiyetle ve sağlıkla...</p>
+    <p class="sign">Hüseyin Pancar</p>
+  </div>
+
+  <footer>Alaçatı</footer>
+
+</div>
+
+<div class="weave"></div>
+
+</body>
+</html>
