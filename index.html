@@ -378,6 +378,8 @@
 
   /* Analytics tab */
   .analytics-actions{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+  .danger-btn{border-color:var(--red) !important; color:var(--red) !important;}
+  .danger-btn:hover{background:var(--red-bg) !important;}
   .analytics-total{
     background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
     font-size:14px; color:var(--muted); margin-bottom:22px;
@@ -481,6 +483,7 @@
         <button class="pdf-btn" onclick="exportToExcel()">⬇ Excel'e Aktar (Yedek)</button>
         <button class="pdf-btn" onclick="document.getElementById('excelImportInput').click()">⬆ Excel'den İçe Aktar</button>
         <input type="file" id="excelImportInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleExcelImport(event)">
+        <button class="pdf-btn danger-btn" onclick="deleteAllVehicles()">🗑 Tümünü Sil</button>
       </div>
       <div id="analyticsWrap"></div>
     </div>
@@ -2274,6 +2277,28 @@ function exportToExcel(){
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Araclar');
   XLSX.writeFile(wb, 'garaj-defteri-yedek.xlsx');
+}
+
+async function deleteAllVehicles(){
+  if(vehicles.length === 0){
+    alert('Silinecek araç yok.');
+    return;
+  }
+  const count = vehicles.length;
+  if(!confirm(`${count} aracın TÜMÜNÜ silmek istediğine emin misin? Bu işlem geri alınamaz.`)) return;
+  if(!confirm('Son kez soruyorum: tüm araçlar, belgeleri ve geçmiş kayıtları kalıcı olarak silinecek. Devam edilsin mi?')) return;
+
+  for(const v of vehicles){
+    for(const cat of ['sigorta','kasko','bakim','vize','ruhsat']){
+      try{ await window.storage.delete('doc:' + v.id + ':' + cat, false); }catch(e){}
+    }
+  }
+  vehicles = [];
+  await persist();
+  render();
+  if(activeTab === 'documents') renderDocumentsTab();
+  if(activeTab === 'analytics') renderAnalyticsTab();
+  alert(`${count} araç silindi.`);
 }
 
 async function handleExcelImport(e){
