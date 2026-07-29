@@ -878,3 +878,77 @@ body.dark .gb-filter-panel,body.dark .gb-analytics-card{background:#182238}body.
 .gb-version-pill{display:inline-flex;align-items:center;border-radius:999px;background:var(--paper-2);color:var(--muted);padding:5px 9px;font-size:10px;font-weight:800;margin-left:8px}
 @media(max-width:600px){.gb-v25-help-card{border-radius:25px 25px 0 0}.gb-simple-toggle{padding:12px 13px}.gb-v25-step{padding:12px 0}}
 body.dark .gb-simple-toggle,body.dark .gb-v25-help-card{background:#1c2027}.body.dark .gb-v25-close{background:#111a2c}
+
+/* =========================================================
+   Garage Book v3.0 — Premium Experience layer
+   ========================================================= */
+:root{
+  --gb-ease:cubic-bezier(.22,.8,.22,1);
+  --gb-shadow-soft:0 16px 42px rgba(15,23,42,.09);
+  --gb-shadow-float:0 24px 70px rgba(15,23,42,.18);
+}
+html{scroll-behavior:smooth}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+button,.drawer-item,.dash-stat,.task-row,.vp-doc,.vp-action-row,.quick-action,.card{touch-action:manipulation}
+button,.drawer-item,.dash-stat,.task-row,.vp-doc,.vp-action-row,.quick-action{
+  transition:transform .18s var(--gb-ease),opacity .18s ease,box-shadow .25s var(--gb-ease),background-color .2s ease;
+}
+button:active,.drawer-item:active,.dash-stat:active,.task-row:active,.vp-doc:active,.vp-action-row:active,.quick-action:active{transform:scale(.975)}
+
+.gb-launch-screen{
+  position:fixed;inset:0;z-index:99999;display:grid;place-content:center;text-align:center;
+  background:var(--bg,#f5f5f7);transition:opacity .45s ease,visibility .45s ease;
+}
+.gb-launch-mark{
+  width:86px;height:86px;border-radius:25px;display:grid;place-items:center;margin:0 auto 16px;
+  background:linear-gradient(145deg,#18181b,#3f3f46);color:white;font-weight:800;font-size:25px;
+  letter-spacing:-1px;box-shadow:0 20px 50px rgba(0,0,0,.22)
+}
+.gb-launch-name{font-size:21px;font-weight:750;letter-spacing:-.5px}
+.gb-launch-line{height:3px;width:72px;border-radius:10px;background:rgba(120,120,128,.2);overflow:hidden;margin:20px auto 0;position:relative}
+.gb-launch-line:after{content:"";position:absolute;inset:0;width:42%;background:currentColor;border-radius:inherit;animation:gbLaunch 1s ease-in-out infinite}
+@keyframes gbLaunch{0%{transform:translateX(-130%)}100%{transform:translateX(330%)}}
+body.gb-ready .gb-launch-screen{opacity:0;visibility:hidden;pointer-events:none}
+
+#view-dashboard,#view-vehicles,#view-documents,#view-analytics{
+  animation:gbViewIn .38s var(--gb-ease) both;
+}
+@keyframes gbViewIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+.dash-hero,.dash-section,.dash-stat,.card,.vp-card{
+  box-shadow:var(--gb-shadow-soft);
+}
+.dash-stat:hover,.quick-action:hover,.card:hover{transform:translateY(-2px)}
+
+.vehicle-profile-overlay{
+  transition:opacity .28s ease,visibility .28s ease;
+}
+.vehicle-profile-shell{
+  transform:translateY(18px) scale(.992);opacity:0;
+  transition:transform .42s var(--gb-ease),opacity .3s ease;
+}
+.vehicle-profile-overlay.open .vehicle-profile-shell,
+.vehicle-profile-overlay[aria-hidden="false"] .vehicle-profile-shell{transform:none;opacity:1}
+.vp-topbar{backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px)}
+
+.overlay{transition:opacity .25s ease,visibility .25s ease}
+.modal{transform:translateY(28px) scale(.985);transition:transform .38s var(--gb-ease),opacity .25s ease}
+.overlay.show .modal,.overlay.active .modal,.overlay[style*="display: flex"] .modal{transform:none}
+
+.gb-toast{
+  position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));z-index:99998;
+  transform:translate(-50%,18px);opacity:0;pointer-events:none;
+  padding:11px 16px;border-radius:999px;background:rgba(28,28,30,.92);color:#fff;
+  font-size:14px;font-weight:650;box-shadow:0 14px 40px rgba(0,0,0,.24);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  transition:opacity .25s ease,transform .35s var(--gb-ease);
+}
+.gb-toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+@media (max-width:700px){
+  .dash-hero,.dash-section,.dash-stat,.card,.vp-card{box-shadow:0 8px 28px rgba(15,23,42,.075)}
+  .gb-launch-mark{width:78px;height:78px;border-radius:23px}
+}

@@ -2855,3 +2855,53 @@ loadDarkModePref();
     const oldOpenModal=window.openModal;if(typeof oldOpenModal==='function')window.openModal=function(){const r=oldOpenModal.apply(this,arguments);setTimeout(improveVehicleModal,0);return r;};
   });
 })();
+
+/* =========================================================
+   Garage Book v3.0 — Premium Experience layer
+   ========================================================= */
+(function initPremiumExperience(){
+  const ready=()=>{
+    requestAnimationFrame(()=>document.body.classList.add('gb-ready'));
+    window.setTimeout(()=>{
+      const splash=document.getElementById('gbLaunchScreen');
+      if(splash) splash.remove();
+      document.body.classList.remove('gb-starting');
+    },700);
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',ready,{once:true});
+  else ready();
+
+  window.gbHaptic=function gbHaptic(kind='light'){
+    if(!('vibrate' in navigator)) return;
+    const patterns={light:8,medium:14,success:[10,35,12],warning:[18,45,18]};
+    try{ navigator.vibrate(patterns[kind]||patterns.light); }catch(_e){}
+  };
+
+  let toastTimer;
+  window.gbToast=function gbToast(message){
+    let el=document.getElementById('gbToast');
+    if(!el){
+      el=document.createElement('div');
+      el.id='gbToast'; el.className='gb-toast'; el.setAttribute('role','status');
+      document.body.appendChild(el);
+    }
+    el.textContent=message;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>el.classList.remove('show'),1800);
+  };
+
+  document.addEventListener('click',e=>{
+    const target=e.target.closest('button,.drawer-item,.dash-stat,.task-row,.vp-doc,.vp-action-row,.quick-action');
+    if(target && !target.disabled) window.gbHaptic('light');
+  },{passive:true});
+
+  const profile=document.getElementById('vehicleProfileOverlay');
+  if(profile){
+    const observer=new MutationObserver(()=>{
+      const isOpen=profile.getAttribute('aria-hidden')==='false' || profile.style.display==='block' || profile.classList.contains('open');
+      profile.classList.toggle('open',isOpen);
+    });
+    observer.observe(profile,{attributes:true,attributeFilter:['aria-hidden','style','class']});
+  }
+})();
