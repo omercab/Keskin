@@ -2306,7 +2306,7 @@ function renderPackagesScreen(){
           <ul class="pkg-features">${t.features.map(f=>`<li>${f}</li>`).join('')}</ul>
           ${isCurrent
             ? `<div class="pkg-current">✓ Aktif Abonelik</div><button class="change-mode-link" style="display:block; text-align:center; margin-top:8px;" onclick="cancelKurumsalSubscription()">Aboneliği İptal Et</button>`
-            : `<button class="pkg-buy-btn" onclick="selectKurumsalTier('${t.key}')">Aboneliği Başlat</button>`}
+            : `<button class="pkg-buy-btn" disabled>Yakında</button>`}
         </div>`;
     }).join('');
     el.innerHTML = `
@@ -2330,7 +2330,7 @@ function renderPackagesScreen(){
           <li>Bildirim ve hatırlatmalar</li>
           <li class="pkg-soon">Yapay Zeka Destekli Belge Analizi (yakında)</li>
         </ul>
-        ${isProBireysel ? `<div class="pkg-current">✓ Pro Sürüm Aktif</div>` : `<button class="pkg-buy-btn" onclick="purchaseBireyselPro()">Pro'ya Geç — 200₺</button>`}
+        ${isProBireysel ? `<div class="pkg-current">✓ Pro Sürüm Aktif</div>` : `<button class="pkg-buy-btn" disabled>Yakında</button>`}
       </div>`;
     el.innerHTML = `
       <h2>⭐ Bireysel Pro</h2>
@@ -2349,23 +2349,15 @@ function openPackagesScreen(){
 }
 
 async function purchaseBireyselPro(){
-  // No real payment processing is wired up yet — this app has no backend/store
-  // integration currently. This simulates the unlock locally so the limit logic
-  // can be tested; real payment needs App Store In-App Purchase once packaged natively.
-  if(!confirm("Ödeme altyapısı henüz bağlı değil (App Store sürümüne geçince eklenecek). Şimdilik Pro özelliklerini test amaçlı açalım mı?")) return;
-  isProBireysel = true;
-  await saveProStatus();
-  renderPackagesScreen();
-  alert('Pro sürüm açıldı. Artık 5 araca kadar kayıt yapabilirsin.');
+  // Real payment (Apple In-App Purchase / StoreKit) ships in a later update.
+  // v1 is free — do not simulate a purchase or unlock here.
+  alert('Pro sürüm yakında App Store üzerinden satın alınabilir olacak.');
 }
 
 async function selectKurumsalTier(tier){
-  if(!confirm("Ödeme altyapısı henüz bağlı değil (App Store sürümüne geçince eklenecek). Şimdilik bu aboneliği test amaçlı başlatalım mı?")) return;
-  kurumsalTier = tier;
-  await saveProStatus();
-  renderPackagesScreen();
-  render();
-  alert('Abonelik başlatıldı.');
+  // Real payment (Apple In-App Purchase / StoreKit) ships in a later update.
+  // v1 is free — do not simulate a purchase or unlock here.
+  alert('Kurumsal abonelikler yakında App Store üzerinden satın alınabilir olacak.');
 }
 
 async function cancelKurumsalSubscription(){
