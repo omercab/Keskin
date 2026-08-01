@@ -2322,7 +2322,7 @@ function renderPackagesScreen(){
     const cardHtml = `
       <div class="pkg-card ${isProBireysel ? 'pkg-highlight' : ''}">
         <div class="pkg-title">Bireysel Pro</div>
-        <div class="pkg-price">200 ₺ <span style="font-size:11px; color:var(--muted); font-weight:400;">(tek seferlik)</span></div>
+        <div class="pkg-price">220 ₺<span style="font-size:14px;">/yıl</span></div>
         <ul class="pkg-features">
           <li>5 araca kadar kayıt (ücretsizde 3)</li>
           <li>Sınırsız belge yükleme</li>
