@@ -24,6 +24,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Araç fotoğrafı veya belge (ruhsat, sigorta, kasko) fotoğrafı çekebilmek için kameraya erişim gerekiyor.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Galeriden araç fotoğrafı veya belge fotoğrafı seçebilmek için fotoğraflara erişim gerekiyor.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
