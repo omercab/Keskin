@@ -2526,6 +2526,20 @@ async function chooseAccountType(type){
   try{ await window.storage.set('accountType', type, false); }catch(e){}
   document.getElementById('onboarding').style.display = 'none';
   await applyAccountType();
+  requestNotificationsOnFirstLaunch();
+}
+
+// Asked once, right after onboarding — not on every app open. Silent (no
+// alert()) either way: the user just interacted with the system permission
+// dialog itself, piling our own confirmation on top of that is just noise.
+// Web-only visitors are left alone here since browsers expect a real user
+// gesture (a button tap) before a permission prompt, not an automatic one.
+async function requestNotificationsOnFirstLaunch(){
+  if(!hasNativeNotifications()) return;
+  try{
+    const granted = await requestNativeNotificationPermission();
+    if(granted) await rescheduleAllReminders();
+  }catch(e){}
 }
 async function resetAccountType(){
   try{ await window.storage.delete('accountType', false); }catch(e){}
