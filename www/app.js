@@ -286,6 +286,8 @@ function chooseManual(cat){
 function chooseReset(cat){
   docCardMode[cat] = 'choose';
   renderCardMode(cat);
+  const note = document.getElementById(cat + '-ai-note');
+  if(note) note.style.display = 'none';
 }
 function selectType(key){
   selectedType = key;
@@ -1236,6 +1238,7 @@ function openModal(id, focusCat){
     document.getElementById(cat+'-status').className = 'doc-status';
     document.getElementById(cat+'-doclinks').innerHTML = '';
     document.getElementById('f-' + cat + '-file').value = '';
+    document.getElementById(cat+'-ai-note').style.display = 'none';
     setCardStatus(cat, '', '');
   });
 
@@ -1937,6 +1940,7 @@ async function handleUpload(cat){
         }
         docCardMode[cat] = 'both';
         renderCardMode(cat);
+        showAiNote(cat);
         if(mismatchWarning){
           statusEl.textContent = mismatchWarning;
           statusEl.className = 'doc-status warn';
@@ -1953,6 +1957,7 @@ async function handleUpload(cat){
       }catch(ocrErr){
         docCardMode[cat] = 'both';
         renderCardMode(cat);
+        showAiNote(cat);
         statusEl.textContent = '✓ Belge saklandı ama otomatik okunamadı, bilgileri aşağıya elle gir.';
         statusEl.className = 'doc-status warn';
         setCardStatus(cat, '✓ Saklandı', 'warn');
@@ -1971,6 +1976,14 @@ async function handleUpload(cat){
     statusEl.className = 'doc-status err';
     hideUploadSpinner();
   }
+}
+
+// Shown once per upload, regardless of read outcome — reminds the user this is
+// still the regex/OCR pipeline (no Claude vision integration yet), so even a
+// "✓ Okundu" result can be silently wrong and needs a human check before saving.
+function showAiNote(cat){
+  const el = document.getElementById(cat + '-ai-note');
+  if(el) el.style.display = 'block';
 }
 
 function setCardStatus(cat, text, level){
