@@ -1,2 +1,10 @@
 .gstack/
 node_modules/
+
+# Xcode / iOS
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/xcode/package.xcworkspace/xcuserdata/
+.DS_Store
+DerivedData/
+*.xcuserstate
