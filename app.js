@@ -592,7 +592,7 @@ function closeAppMenu(){
 function setDrawerActive(key){
   document.querySelectorAll('.drawer-item[data-menu]').forEach(el=>el.classList.toggle('active',el.dataset.menu===key));
   document.querySelectorAll('.bottomnav-item[data-menu]').forEach(el=>{
-    const on=el.dataset.menu===key || (key==='inactive' && el.dataset.menu==='vehicles');
+    const on=el.dataset.menu===key;
     el.classList.toggle('active',on);
     if(on) el.setAttribute('aria-current','page'); else el.removeAttribute('aria-current');
   });
@@ -604,9 +604,7 @@ function drawerNavigate(target){
   if(target==='home'){
     statusFilter='aktif'; switchTab('dashboard'); setPageTitle('Ana Sayfa'); setDrawerActive('home');
   }else if(target==='vehicles'){
-    statusFilter='aktif'; switchTab('vehicles'); render(); setPageTitle('Araçlarım'); setDrawerActive('vehicles');
-  }else if(target==='inactive'){
-    statusFilter='pasif'; switchTab('vehicles'); render(); setPageTitle('Pasif Araçlar'); setDrawerActive('inactive');
+    statusFilter='aktif'; switchTab('vehicles'); render(); setPageTitle('Aktif Araçlarım'); setDrawerActive('vehicles');
   }else if(target==='documents'){
     switchTab('documents'); setPageTitle('Belgelerim'); setDrawerActive('documents');
   }else if(target==='analytics'){
@@ -906,15 +904,11 @@ function renderDashboard(){
   const stats=document.getElementById('dashboardStats'), tasks=document.getElementById('dashboardTasks');
   if(!stats||!tasks) return;
   renderHeroVehicle();
-  const active=vehicles.filter(v=>(v.status||'aktif')==='aktif').length;
-  const inactive=vehicles.filter(v=>v.status==='pasif').length;
   const taskItems=buildDashboardTasks();
   const urgentVehicles=new Set(taskItems.map(x=>x.vehicle.id)).size;
   stats.innerHTML=`
     <div class="stat-card lg" onclick="drawerNavigate('vehicles')"><div class="stat-value">${vehicles.length}</div><div class="stat-label">Toplam Araç</div></div>
-    <div class="stat-card lg" onclick="drawerNavigate('vehicles')"><div class="stat-value">${active}</div><div class="stat-label">Aktif Araç</div></div>
-    <div class="stat-card sm" onclick="drawerNavigate('inactive')"><div class="stat-value">${inactive}</div><div class="stat-label">Pasif Araç</div></div>
-    <div class="stat-card sm" onclick="drawerNavigate('vehicles')"><div class="stat-value">${urgentVehicles}</div><div class="stat-label">Yaklaşan İşlem</div></div>`;
+    <div class="stat-card lg" onclick="drawerNavigate('vehicles')"><div class="stat-value">${urgentVehicles}</div><div class="stat-label">Yaklaşan İşlem</div></div>`;
   const sub=document.getElementById('dashHeroSub');
   if(sub) sub.textContent=vehicles.length ? (urgentVehicles ? `${urgentVehicles} araç için önümüzdeki 30 gün içinde işlem gerekiyor.` : 'Yaklaşan kritik işlem görünmüyor. Araçların kontrol altında.') : 'İlk aracını ekleyerek bakım ve belge takibine başla.';
   if(!taskItems.length){
