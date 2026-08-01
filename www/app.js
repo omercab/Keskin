@@ -2590,7 +2590,7 @@ function notifIdFor(vehicleId, cat, offsetDays){
   return hash;
 }
 
-const REMINDER_OFFSETS_DAYS = [14, 3, 0];
+const REMINDER_OFFSETS_DAYS = [30, 14, 3, 0];
 
 async function requestNativeNotificationPermission(){
   if(!hasNativeNotifications()) return false;
@@ -2628,7 +2628,7 @@ async function scheduleRemindersForVehicle(v){
         notifications.push({
           id: notifIdFor(v.id, it.cat, off),
           title: 'Garage Book Hatırlatma',
-          body: `${v.plate || ''} - ${it.label}${off === 0 ? ' bugün doluyor' : ' ' + off + ' gün sonra doluyor'}`,
+          body: `${v.plate || ''} - ${it.label}${off === 0 ? ' bugün doluyor' : off === 30 ? ' 1 ay sonra doluyor' : ' ' + off + ' gün sonra doluyor'}`,
           schedule: {at}
         });
       }
@@ -2652,7 +2652,7 @@ async function enableNotifications(){
     const granted = await requestNativeNotificationPermission();
     if(granted){
       await rescheduleAllReminders();
-      alert('Bildirimler açıldı. Vadesi yaklaşan belgeler için, uygulama kapalıyken bile 14 gün, 3 gün ve son gün kala hatırlatma alacaksın.');
+      alert('Bildirimler açıldı. Vadesi yaklaşan belgeler için, uygulama kapalıyken bile 1 ay, 14 gün, 3 gün ve son gün kala hatırlatma alacaksın.');
     } else {
       alert('Bildirim izni verilmedi.');
     }
