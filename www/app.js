@@ -1572,7 +1572,9 @@ function ocrExtractVehicleTypeLabel(normText){
 }
 
 function ocrExtractPlate(text){
-  const m = text.match(/\b(\d{2})\s*([A-PR-VYZ]{1,3})\s*(\d{2,5})\b/);
+  // Some insurers zero-pad the 2-digit il kodu ("035 BTA487" instead of "35 BTA487") —
+  // strip the leading zero so the plate still matches and normalizes correctly.
+  const m = text.match(/\b0?(\d{2})\s*([A-PR-VYZ]{1,3})\s*(\d{2,5})\b/);
   if(!m) return null;
   return `${m[1]} ${m[2].toUpperCase()} ${m[3]}`;
 }
@@ -1604,10 +1606,20 @@ function ocrExtractAmounts(text){
 }
 
 function ocrExtractCompany(text){
-  const upper = text.toUpperCase();
+  const norm = trNormalize(text);
+  // Prefer the name declared right after the "Sigorta Şirketi" label — a bare
+  // whole-document substring scan is unreliable because a company key can be a
+  // common word (e.g. "Türkiye" in "Türkiye Sigorta") that shows up in marketing
+  // copy or another insurer's name with nothing to do with who issued this policy.
+  const labelIdx = norm.search(/SIGORTA\s*SIRKETI/);
+  const window = labelIdx >= 0 ? norm.slice(labelIdx, labelIdx + 120) : '';
   for(const c of INSURANCE_COMPANIES){
-    const key = c.replace(' Sigorta','').toUpperCase();
-    if(key && upper.includes(key)) return c;
+    const key = trNormalize(c.replace(' Sigorta',''));
+    if(key && window.includes(key)) return c;
+  }
+  for(const c of INSURANCE_COMPANIES){
+    const key = trNormalize(c.replace(' Sigorta',''));
+    if(key && norm.includes(key)) return c;
   }
   return null;
 }
@@ -1738,6 +1750,47 @@ async function pdfFirstPageToImageBlob(file){
   });
 }
 
+// Many real-world sigorta/ruhsat PDFs are born-digital (a real text layer, not a
+// scan) and often bury the actual policy data past a cover/ad page (seen firsthand
+// in a Quick Sigorta export where page 1 is pure marketing). Reading the embedded
+// text directly — across the first several pages — is both more accurate than
+// rasterizing+OCR'ing an image of the text, and page-order-independent.
+// pdf.js returns text items in PDF content-stream order, which for multi-column
+// tables (common in Turkish insurance policies — teminat/prim tables side by side)
+// does NOT match visual reading order: a label and its value can land far apart
+// in the raw stream even though they sit on the same table row. Reconstruct
+// top-to-bottom, left-to-right order using each item's actual position on the
+// page so label-proximity extraction (dates, amounts, company name) reads the
+// value that's actually next to the label on screen.
+function reconstructReadingOrder(items){
+  const rows = [];
+  const lineTolerance = 3; // px, groups items on the same visual line
+  items.forEach(it=>{
+    const x = it.transform[4], y = it.transform[5];
+    let row = rows.find(r=>Math.abs(r.y - y) <= lineTolerance);
+    if(!row){ row = {y, items:[]}; rows.push(row); }
+    row.items.push({x, str: it.str});
+  });
+  rows.sort((a,b)=> b.y - a.y); // PDF y-axis grows upward, so higher y = higher on the page
+  return rows.map(r=> r.items.sort((a,b)=>a.x-b.x).map(i=>i.str).join(' ')).join('\n');
+}
+
+async function extractPdfText(file){
+  if(typeof pdfjsLib === 'undefined'){
+    throw new Error('PDF okuma modülü yüklenemedi');
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+  const maxPages = Math.min(pdf.numPages, 8);
+  let combined = '';
+  for(let i = 1; i <= maxPages; i++){
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    combined += reconstructReadingOrder(content.items) + '\n';
+  }
+  return combined;
+}
+
 async function runOcrAndFill(cat, file){
   if(typeof Tesseract === 'undefined'){
     throw new Error('OCR modülü yüklenemedi');
@@ -1745,6 +1798,10 @@ async function runOcrAndFill(cat, file){
   const result = await Tesseract.recognize(file, 'tur+eng');
   const text = (result && result.data && result.data.text) ? result.data.text : '';
   const confidence = (result && result.data && typeof result.data.confidence === 'number') ? result.data.confidence : null;
+  return fillFieldsFromText(cat, text, confidence);
+}
+
+function fillFieldsFromText(cat, text, confidence){
   const normText = trNormalize(text);
 
   let mismatchWarning = null;
@@ -1865,16 +1922,26 @@ async function handleUpload(cat){
       statusEl.textContent = 'Belge okunuyor… (ilk seferde biraz uzun sürebilir)';
       showUploadSpinner();
       try{
-        const rawInput = file.type === 'application/pdf' ? await pdfFirstPageToImageBlob(file) : file;
-        const cleanedInput = await preprocessImageForOcr(rawInput);
-        const {mismatchWarning, confidence} = await runOcrAndFill(cat, cleanedInput);
+        let mismatchWarning, confidence, readAsText = false;
+        if(file.type === 'application/pdf'){
+          const pdfText = await extractPdfText(file);
+          if(pdfText.replace(/\s+/g, '').length > 40){
+            readAsText = true;
+            ({mismatchWarning, confidence} = fillFieldsFromText(cat, pdfText, 100));
+          }
+        }
+        if(!readAsText){
+          const rawInput = file.type === 'application/pdf' ? await pdfFirstPageToImageBlob(file) : file;
+          const cleanedInput = await preprocessImageForOcr(rawInput);
+          ({mismatchWarning, confidence} = await runOcrAndFill(cat, cleanedInput));
+        }
         docCardMode[cat] = 'both';
         renderCardMode(cat);
         if(mismatchWarning){
           statusEl.textContent = mismatchWarning;
           statusEl.className = 'doc-status warn';
           setCardStatus(cat, '⚠ Kontrol et', 'warn');
-        } else if(confidence !== null && confidence < 55){
+        } else if(!readAsText && confidence !== null && confidence < 55){
           statusEl.textContent = '⚠ Belge net okunamadı (bulanık/eğik olabilir). Bulduklarımı doldurdum ama mutlaka kontrol et, gerekirse daha net bir fotoğrafla tekrar dene.';
           statusEl.className = 'doc-status warn';
           setCardStatus(cat, '⚠ Netlik düşük', 'warn');
