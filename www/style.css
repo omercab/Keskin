@@ -1018,7 +1018,7 @@ body.gb-ready .gb-launch-screen{opacity:0;visibility:hidden;pointer-events:none}
 
 .overlay{transition:opacity .25s ease,visibility .25s ease}
 .modal{transform:translateY(28px) scale(.985);transition:transform .38s var(--gb-ease),opacity .25s ease}
-.overlay.show .modal,.overlay.active .modal,.overlay[style*="display: flex"] .modal{transform:none}
+.overlay.open .modal,.overlay.show .modal,.overlay.active .modal,.overlay[style*="display: flex"] .modal{transform:none}
 
 .gb-toast{
   position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));z-index:99998;
