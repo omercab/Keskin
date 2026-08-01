@@ -735,8 +735,8 @@ function renderDocumentsTab(){
   wrap.innerHTML = sorted.map(v=>{
     const rows = DOC_CAT_META.map(c=>{
       const doc = v.docs && v.docs[c.key];
-      if(!doc) return `<div class="doc-row muted">${c.label}: yüklenmedi</div>`;
-      return `<div class="doc-row"><span>${c.label}: ${escapeHtml(doc.fileName || 'belge')}</span><a onclick="viewDocFor('${v.id}','${c.key}')">Görüntüle</a></div>`;
+      if(!doc) return `<div class="doc-row muted"><span>${c.label}: yüklenmedi</span><a onclick="openModal('${v.id}','${c.key}')">+ Belge Ekle</a></div>`;
+      return `<div class="doc-row"><span>${c.label}: ${escapeHtml(doc.fileName || 'belge')}</span><span class="doc-row-actions"><a onclick="viewDocFor('${v.id}','${c.key}')">Görüntüle</a><a onclick="openModal('${v.id}','${c.key}')">Değiştir</a></span></div>`;
     }).join('');
     const isPasif = v.status === 'pasif';
     return `

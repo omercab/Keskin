@@ -504,6 +504,7 @@
   .doc-row{display:flex; align-items:center; justify-content:space-between; font-size:13px; padding:6px 0; border-top:1px solid var(--paper-2);}
   .doc-row.muted{color:var(--muted); font-size:12.5px;}
   .doc-row a{color:var(--navy); font-weight:600; cursor:pointer; text-decoration:underline; font-size:12.5px;}
+  .doc-row-actions{display:flex; gap:12px; flex:none;}
 
   /* Analytics tab */
   .analytics-actions{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
