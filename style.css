@@ -292,6 +292,17 @@
   .card .icon-btn:hover{border-color:var(--navy); background:#fff;}
   .icon-btn{background:none; border:none; cursor:pointer; font-size:15px; color:var(--muted); padding:6px; border-radius:6px; line-height:1;}
   .icon-btn:hover{background:var(--paper-2); color:var(--ink);}
+  .fav-btn.active{color:var(--orange-2); border-color:var(--orange-2);}
+
+  .fav-strip-section{margin-top:0}
+  .fav-strip{display:flex; gap:12px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch;}
+  .fav-chip{flex:none; width:150px; background:var(--db-card); border:1px solid var(--db-line); border-radius:var(--db-radius-sm); box-shadow:var(--db-shadow); padding:12px; cursor:pointer;}
+  .fav-chip-photo{width:100%; height:80px; border-radius:8px; object-fit:cover; margin-bottom:8px;}
+  .fav-chip-photo-placeholder{display:flex; align-items:center; justify-content:center; font-size:30px; background:var(--paper-2);}
+  .fav-chip-name{font-weight:700; font-size:13px; color:var(--ink); overflow-wrap:break-word;}
+  .fav-chip-plate{font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0.05em; margin-top:2px;}
+  .fav-section-label{margin:18px 0 10px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;}
+  .fav-section-label:first-child{margin-top:0}
 
   .urgent-line{
     margin:10px 16px 14px; padding:10px 12px; border-radius:9px; font-size:13px; font-weight:600;

@@ -114,6 +114,7 @@
     <nav class="drawer-nav" aria-label="Ana menü">
       <button class="drawer-item active" data-menu="home" onclick="drawerNavigate('home')"><span class="drawer-icon">🏠</span><span class="drawer-label">Ana Sayfa</span><span class="drawer-chevron">›</span></button>
       <button class="drawer-item" data-menu="vehicles" onclick="drawerNavigate('vehicles')"><span class="drawer-icon">🚗</span><span class="drawer-label">Aktif Araçlarım</span><span class="drawer-chevron">›</span></button>
+      <button class="drawer-item" data-menu="favorites" onclick="drawerNavigate('favorites')"><span class="drawer-icon">⭐</span><span class="drawer-label">Favori Araçlarım</span><span class="drawer-chevron">›</span></button>
       <button class="drawer-item" data-menu="documents" onclick="drawerNavigate('documents')"><span class="drawer-icon">📄</span><span class="drawer-label">Belgelerim</span><span class="drawer-chevron">›</span></button>
       <button class="drawer-item" data-menu="analytics" onclick="drawerNavigate('analytics')"><span class="drawer-icon">📊</span><span class="drawer-label">Analizler</span><span class="drawer-chevron">›</span></button>
     </nav>
@@ -152,6 +153,7 @@
         <div class="dash-sub" id="dashHeroSub">Filo durumun ve yaklaşan işlemler burada özetlenir.</div>
       </section>
       <div id="heroVehicleWrap"></div>
+      <div id="favoriteVehiclesWrap"></div>
       <div class="dash-stats" id="dashboardStats"></div>
       <section class="dash-section">
         <div class="dash-section-head"><div><div class="dash-section-title">Görev Merkezi</div><div class="dash-section-sub">Öncelik sırasına göre ilgilenmen gereken araçlar</div></div><button class="dash-link" onclick="drawerNavigate('vehicles')">Tüm araçlar</button></div>
@@ -186,6 +188,10 @@
       <div class="grid" id="grid">
         <div class="loading-note">Yükleniyor...</div>
       </div>
+    </div>
+
+    <div id="view-favorites" style="display:none;">
+      <div class="grid" id="favoritesGrid"></div>
     </div>
 
     <div id="view-documents" style="display:none;">

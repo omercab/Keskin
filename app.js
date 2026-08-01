@@ -439,6 +439,7 @@ async function loadVehicles(){
 }
 function normalizeVehicle(v){
   v.status = v.status || 'aktif';
+  v.favorite = !!v.favorite;
   v.color = v.color || '';
   v.photo = v.photo || '';
   v.sigorta = v.sigorta || {date:'', startDate:'', company:'', amount:''};
@@ -605,6 +606,8 @@ function drawerNavigate(target){
     statusFilter='aktif'; switchTab('dashboard'); setPageTitle('Ana Sayfa'); setDrawerActive('home');
   }else if(target==='vehicles'){
     statusFilter='aktif'; switchTab('vehicles'); render(); setPageTitle('Aktif Araçlarım'); setDrawerActive('vehicles');
+  }else if(target==='favorites'){
+    switchTab('favorites'); setPageTitle('Favori Araçlarım'); setDrawerActive('favorites');
   }else if(target==='documents'){
     switchTab('documents'); setPageTitle('Belgelerim'); setDrawerActive('documents');
   }else if(target==='analytics'){
@@ -650,11 +653,56 @@ function switchTab(tab){
   const dashboard=document.getElementById('view-dashboard');
   if(dashboard) dashboard.style.display = tab === 'dashboard' ? '' : 'none';
   document.getElementById('view-vehicles').style.display = tab === 'vehicles' ? '' : 'none';
+  document.getElementById('view-favorites').style.display = tab === 'favorites' ? '' : 'none';
   document.getElementById('view-documents').style.display = tab === 'documents' ? '' : 'none';
   document.getElementById('view-analytics').style.display = tab === 'analytics' ? '' : 'none';
   if(tab === 'dashboard') renderDashboard();
+  if(tab === 'favorites') renderFavoritesTab();
   if(tab === 'documents') renderDocumentsTab();
   if(tab === 'analytics') renderAnalyticsTab();
+}
+
+function toggleFavorite(id){
+  const v = vehicles.find(x=>x.id===id);
+  if(!v) return;
+  v.favorite = !v.favorite;
+  persist();
+  renderDashboard();
+  if(activeTab === 'vehicles') render();
+  if(activeTab === 'favorites') renderFavoritesTab();
+}
+
+function renderFavoriteCard(v){
+  const brandModel = [v.brand, v.model].filter(Boolean).join(' ') || 'Marka/model belirtilmedi';
+  return `
+    <div class="card fav-card" style="background:${colorToBg(v.color)}; border-left:6px solid ${colorToHex(v.color)};" onclick="openVehicleProfile('${v.id}')">
+      <div class="card-head">
+        ${v.photo ? `<img class="card-photo" src="${v.photo}" alt="">` : `<div class="card-photo-placeholder">${typeIcon(v.type)}</div>`}
+        <div class="card-head-left">
+          <span class="brand-name">${escapeHtml(brandModel)}</span>
+          <span class="plate-sub">${escapeHtml((v.plate || '—').toUpperCase())}${v.year ? ' · ' + escapeHtml(v.year) : ''}</span>
+        </div>
+        <button class="icon-btn fav-btn ${v.favorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${v.id}')" title="${v.favorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}">${v.favorite ? '⭐' : '☆'}</button>
+      </div>
+    </div>`;
+}
+
+function renderFavoritesTab(){
+  const grid = document.getElementById('favoritesGrid');
+  if(!grid) return;
+  if(vehicles.length === 0){
+    grid.innerHTML = `<div class="empty"><p>Henüz araç eklenmedi.</p></div>`;
+    return;
+  }
+  const sorted = vehicles.slice().sort((a,b)=>{
+    if(!!a.favorite !== !!b.favorite) return a.favorite ? -1 : 1;
+    return (a.plate||'').localeCompare(b.plate||'', 'tr');
+  });
+  const favCount = sorted.filter(v=>v.favorite).length;
+  const favSection = favCount ? `<div class="dash-section-sub fav-section-label">Favori Araçların (${favCount})</div>` + sorted.filter(v=>v.favorite).map(renderFavoriteCard).join('') : `<div class="empty"><p>Henüz favori araç yok. Aşağıdaki listeden ⭐ ikonuna dokunarak ekleyebilirsin.</p></div>`;
+  const otherVehicles = sorted.filter(v=>!v.favorite);
+  const otherSection = otherVehicles.length ? `<div class="dash-section-sub fav-section-label">Diğer Araçlar</div>` + otherVehicles.map(renderFavoriteCard).join('') : '';
+  grid.innerHTML = favSection + otherSection;
 }
 
 function renderStatusFilterBar(){
@@ -900,10 +948,28 @@ function renderHeroVehicle(){
     <button class="hero-vehicle-cta" onclick="event.stopPropagation();openVehicleProfile('${v.id}')">Araç Profiline Git ›</button>
   </section>`;
 }
+
+function renderFavoriteVehicles(){
+  const wrap=document.getElementById('favoriteVehiclesWrap');
+  if(!wrap) return;
+  const favs=vehicles.filter(v=>v.favorite);
+  if(!favs.length){ wrap.innerHTML=''; return; }
+  wrap.innerHTML=`<section class="dash-section fav-strip-section">
+    <div class="dash-section-head"><div><div class="dash-section-title">⭐ Favori Araçların</div></div><button class="dash-link" onclick="drawerNavigate('favorites')">Tümünü Gör</button></div>
+    <div class="fav-strip">${favs.map(v=>`
+      <div class="fav-chip" onclick="openVehicleProfile('${v.id}')">
+        ${v.photo ? `<img class="fav-chip-photo" src="${v.photo}" alt="">` : `<div class="fav-chip-photo fav-chip-photo-placeholder">${typeIcon(v.type)}</div>`}
+        <div class="fav-chip-name">${escapeHtml([v.brand,v.model].filter(Boolean).join(' ')||'Araç')}</div>
+        <div class="fav-chip-plate">${escapeHtml((v.plate||'—').toUpperCase())}</div>
+      </div>`).join('')}
+    </div>
+  </section>`;
+}
 function renderDashboard(){
   const stats=document.getElementById('dashboardStats'), tasks=document.getElementById('dashboardTasks');
   if(!stats||!tasks) return;
   renderHeroVehicle();
+  renderFavoriteVehicles();
   const taskItems=buildDashboardTasks();
   const urgentVehicles=new Set(taskItems.map(x=>x.vehicle.id)).size;
   stats.innerHTML=`
@@ -1117,6 +1183,7 @@ function render(){
             <span class="plate-sub">${escapeHtml((v.plate || '—').toUpperCase())}${v.year ? ' · ' + escapeHtml(v.year) : ''}</span>
           </div>
           <span class="health-badge ${getVehicleHealth(v).level}">${getVehicleHealth(v).level==='green'?'●':getVehicleHealth(v).level==='amber'?'●':getVehicleHealth(v).level==='red'?'●':'○'} ${getVehicleHealth(v).label}</span>
+          <button class="icon-btn fav-btn ${v.favorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${v.id}')" title="${v.favorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}">${v.favorite ? '⭐' : '☆'}</button>
           <button class="icon-btn" onclick="event.stopPropagation(); openModal('${v.id}')" title="Düzenle">✎</button>
         </div>
         <div class="urgent-line level-${urgentLevel}">
