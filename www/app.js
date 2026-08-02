@@ -480,14 +480,17 @@ function addYears(dateStr, years){
 function onBakimDateChange(){
   const v = document.getElementById('f-bakim').value;
   if(v) document.getElementById('f-bakim-next').value = addYears(v, 1);
+  if(window.gbRefreshDateButtons) window.gbRefreshDateButtons();
 }
 function onSigortaDateChange(){
   const v = document.getElementById('f-sigorta').value;
   if(v) document.getElementById('f-sigorta-start').value = addYears(v, -1);
+  if(window.gbRefreshDateButtons) window.gbRefreshDateButtons();
 }
 function onKaskoDateChange(){
   const v = document.getElementById('f-kasko').value;
   if(v) document.getElementById('f-kasko-start').value = addYears(v, -1);
+  if(window.gbRefreshDateButtons) window.gbRefreshDateButtons();
 }
 
 function daysUntil(dateStr){
@@ -1376,6 +1379,7 @@ function openModal(id, focusCat){
     renderAllCardModes();
   }
   setupEditorSections(!!id, focusCat);
+  if(window.gbRefreshDateButtons) window.gbRefreshDateButtons();
   overlay.classList.add('open');
 }
 
@@ -1897,6 +1901,7 @@ function fillFieldsFromText(cat, text, confidence){
     else mismatchWarning = checkPlateMismatch(plate);
   }
 
+  if(window.gbRefreshDateButtons) window.gbRefreshDateButtons();
   return {mismatchWarning, confidence};
 }
 
@@ -2409,12 +2414,12 @@ async function saveProStatus(){
 
 function getVehicleLimit(){
   if(accountType === 'kurumsal'){
-    if(kurumsalTier === '10') return 10;
-    if(kurumsalTier === '20') return 20;
-    if(kurumsalTier === '100' || kurumsalTier === '200') return 200;
+    if(kurumsalTier === '25') return 25;
+    if(kurumsalTier === '75') return 75;
+    if(kurumsalTier === '200') return 200;
     return 0;
   }
-  return isProBireysel ? 5 : 3;
+  return isProBireysel ? 10 : 3;
 }
 
 function openContactEmail(){
@@ -2434,9 +2439,9 @@ function renderPackagesScreen(){
 
   if(accountType === 'kurumsal'){
     const tiers = [
-      {key:'10', label:'10 Araca Kadar', price:'500 ₺', features:['10 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'20', label:'20 Araca Kadar', price:'800 ₺', features:['20 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'200', label:'200 Araca Kadar', price:'5000 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'25', label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'75', label:'Kurumsal Standart', price:'1.999 ₺', features:['75 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'200', label:'Kurumsal Plus', price:'4.999 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
     ];
     const cardsHtml = tiers.map(t=>{
       const isCurrent = kurumsalTier === t.key;
@@ -2455,6 +2460,12 @@ function renderPackagesScreen(){
       <p style="font-size:12px; color:var(--muted); margin:-10px 0 4px;">Yıllık abonelik, istediğin zaman iptal edebilirsin.</p>
       <p style="font-size:13px; color:var(--muted); margin:0 0 16px;">Filondaki araç sayısına göre bir paket seç.</p>
       ${cardsHtml}
+      <div class="pkg-card">
+        <div class="pkg-title">200+ Araç</div>
+        <div class="pkg-price" style="font-size:16px;">Özel fiyatlandırma</div>
+        <ul class="pkg-features"><li>Büyük filolar için özel teklif</li></ul>
+        <a class="pkg-buy-btn" style="display:block; text-align:center; text-decoration:none;" href="${mailto}">Bize Ulaşın</a>
+      </div>
       ${privacyHtml}
       ${contactHtml}
       <div class="modal-actions"><button class="btn-secondary" onclick="closePackagesScreen()">Kapat</button></div>
@@ -2463,9 +2474,9 @@ function renderPackagesScreen(){
     const cardHtml = `
       <div class="pkg-card ${isProBireysel ? 'pkg-highlight' : ''}">
         <div class="pkg-title">Bireysel Pro</div>
-        <div class="pkg-price">220 ₺<span style="font-size:14px;">/yıl</span></div>
+        <div class="pkg-price">249 ₺<span style="font-size:14px;">/yıl</span></div>
         <ul class="pkg-features">
-          <li>5 araca kadar kayıt (ücretsizde 3)</li>
+          <li>10 araca kadar kayıt (ücretsizde 3)</li>
           <li>Sınırsız belge yükleme</li>
           <li>PDF ve Excel dışa aktarma</li>
           <li>Bildirim ve hatırlatmalar</li>
