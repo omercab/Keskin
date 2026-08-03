@@ -2419,7 +2419,7 @@ function getVehicleLimit(){
     if(kurumsalTier === '200') return 200;
     return 0;
   }
-  return isProBireysel ? 10 : 3;
+  return isProBireysel ? 10 : 1;
 }
 
 function openContactEmail(){
@@ -2476,7 +2476,7 @@ function renderPackagesScreen(){
         <div class="pkg-title">Bireysel Pro</div>
         <div class="pkg-price">249 ₺<span style="font-size:14px;">/yıl</span></div>
         <ul class="pkg-features">
-          <li>10 araca kadar kayıt (ücretsizde 3)</li>
+          <li>10 araca kadar kayıt (ücretsizde 1)</li>
           <li>Sınırsız belge yükleme</li>
           <li>PDF ve Excel dışa aktarma</li>
           <li>Bildirim ve hatırlatmalar</li>
@@ -2486,7 +2486,7 @@ function renderPackagesScreen(){
       </div>`;
     el.innerHTML = `
       <h2>⭐ Bireysel Pro</h2>
-      <p style="font-size:13px; color:var(--muted); margin:0 0 16px;">Ücretsiz sürümde 3 araca kadar kayıt yapabilirsin.</p>
+      <p style="font-size:13px; color:var(--muted); margin:0 0 16px;">Ücretsiz sürümde 1 araca kadar kayıt yapabilirsin.</p>
       ${cardHtml}
       ${privacyHtml}
       ${contactHtml}
@@ -2537,6 +2537,9 @@ async function chooseAccountType(type){
   try{ await window.storage.set('accountType', type, false); }catch(e){}
   document.getElementById('onboarding').style.display = 'none';
   await applyAccountType();
+  if(type === 'bireysel' && !isProBireysel){
+    openPackagesScreen();
+  }
   requestNotificationsOnFirstLaunch();
 }
 
