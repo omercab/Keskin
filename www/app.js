@@ -2389,6 +2389,52 @@ async function handleExcelImport(e){
 let isProBireysel = false;
 let kurumsalTier = null;
 
+const IAP_PRODUCT_IDS = {
+  bireyselPro: 'com.majkasolutions.garagebook.pro.yillik',
+  kurumsal25: 'com.majkasolutions.garagebook.kurumsal.baslangic',
+  kurumsal75: 'com.majkasolutions.garagebook.kurumsal.standart',
+  kurumsal200: 'com.majkasolutions.garagebook.kurumsal.plus',
+};
+
+function hasNativeIAP(){
+  return !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.IAPPurchases);
+}
+
+// Cached live product info (price/name) from StoreKit, keyed by product id.
+// Apple requires the price you display to match what StoreKit reports, so
+// renderPackagesScreen() prefers this over the hardcoded fallback text.
+let iapProductsCache = null;
+async function loadIAPProducts(){
+  if(!hasNativeIAP()) return {};
+  if(iapProductsCache) return iapProductsCache;
+  try{
+    const ids = Object.values(IAP_PRODUCT_IDS);
+    const res = await window.Capacitor.Plugins.IAPPurchases.getProducts({productIds: ids});
+    const map = {};
+    (res.products || []).forEach(p => { map[p.id] = p; });
+    iapProductsCache = map;
+    return map;
+  }catch(e){ return {}; }
+}
+
+// Reconciles local Pro/Kurumsal flags with Apple's actual subscription state
+// (StoreKit is the source of truth — a renewal lapse, refund, or a purchase
+// restored on a new device all show up here). Called on every app launch;
+// safe to call again anytime, it just re-derives from currentEntitlements.
+async function syncEntitlementsFromStore(){
+  if(!hasNativeIAP()) return;
+  try{
+    const res = await window.Capacitor.Plugins.IAPPurchases.getActiveEntitlements();
+    const active = new Set(res.activeProductIds || []);
+    isProBireysel = active.has(IAP_PRODUCT_IDS.bireyselPro);
+    if(active.has(IAP_PRODUCT_IDS.kurumsal200)) kurumsalTier = '200';
+    else if(active.has(IAP_PRODUCT_IDS.kurumsal75)) kurumsalTier = '75';
+    else if(active.has(IAP_PRODUCT_IDS.kurumsal25)) kurumsalTier = '25';
+    else kurumsalTier = null;
+    await saveProStatus();
+  }catch(e){}
+}
+
 function proStatusKey(){
   return 'proStatus_' + (accountType || 'bireysel');
 }
@@ -2437,22 +2483,29 @@ function renderPackagesScreen(){
   const contactHtml = `<div class="pkg-contact">Sorun mu var, önerin mi var?<br><a href="${mailto}">majkasolutionsturkey@gmail.com</a></div>`;
   const privacyHtml = `<div class="pkg-contact">🔒 Tüm bilgilerin sadece bu telefonda saklanır, hiçbir yere aktarılmaz.</div>`;
 
+  const restoreHtml = hasNativeIAP()
+    ? `<button class="change-mode-link" style="display:block; text-align:center; width:100%; margin-top:4px;" onclick="restoreIAPPurchases()">Satın Almaları Geri Yükle</button>`
+    : '';
+
   if(accountType === 'kurumsal'){
     const tiers = [
-      {key:'25', label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'75', label:'Kurumsal Standart', price:'1.999 ₺', features:['75 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'200', label:'Kurumsal Plus', price:'4.999 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'25', productId: IAP_PRODUCT_IDS.kurumsal25, label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'75', productId: IAP_PRODUCT_IDS.kurumsal75, label:'Kurumsal Standart', price:'1.999 ₺', features:['75 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'200', productId: IAP_PRODUCT_IDS.kurumsal200, label:'Kurumsal Plus', price:'4.999 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
     ];
     const cardsHtml = tiers.map(t=>{
       const isCurrent = kurumsalTier === t.key;
+      const liveProduct = iapProductsCache ? iapProductsCache[t.productId] : null;
+      const priceLabel = liveProduct ? liveProduct.displayPrice : t.price;
+      const buyDisabled = !hasNativeIAP() || !liveProduct;
       return `
         <div class="pkg-card ${isCurrent ? 'pkg-highlight' : ''}">
           <div class="pkg-title">${t.label}</div>
-          <div class="pkg-price">${t.price}<span style="font-size:14px;">/yıl</span></div>
+          <div class="pkg-price">${priceLabel}<span style="font-size:14px;">/yıl</span></div>
           <ul class="pkg-features">${t.features.map(f=>`<li>${f}</li>`).join('')}</ul>
           ${isCurrent
-            ? `<div class="pkg-current">✓ Aktif Abonelik</div><button class="change-mode-link" style="display:block; text-align:center; margin-top:8px;" onclick="cancelKurumsalSubscription()">Aboneliği İptal Et</button>`
-            : `<button class="pkg-buy-btn" disabled>Yakında</button>`}
+            ? `<div class="pkg-current">✓ Aktif Abonelik</div><button class="change-mode-link" style="display:block; text-align:center; margin-top:8px;" onclick="openManageSubscriptions()">Aboneliği Yönet / İptal Et</button>`
+            : `<button class="pkg-buy-btn" ${buyDisabled ? 'disabled' : ''} onclick="selectKurumsalTier('${t.key}')">${buyDisabled ? 'Yakında' : 'Satın Al'}</button>`}
         </div>`;
     }).join('');
     el.innerHTML = `
@@ -2466,15 +2519,19 @@ function renderPackagesScreen(){
         <ul class="pkg-features"><li>Büyük filolar için özel teklif</li></ul>
         <a class="pkg-buy-btn" style="display:block; text-align:center; text-decoration:none;" href="${mailto}">Bize Ulaşın</a>
       </div>
+      ${restoreHtml}
       ${privacyHtml}
       ${contactHtml}
       <div class="modal-actions"><button class="btn-secondary" onclick="closePackagesScreen()">Kapat</button></div>
     `;
   } else {
+    const liveProduct = iapProductsCache ? iapProductsCache[IAP_PRODUCT_IDS.bireyselPro] : null;
+    const priceLabel = liveProduct ? liveProduct.displayPrice : '249 ₺';
+    const buyDisabled = !hasNativeIAP() || !liveProduct;
     const cardHtml = `
       <div class="pkg-card ${isProBireysel ? 'pkg-highlight' : ''}">
         <div class="pkg-title">Bireysel Pro</div>
-        <div class="pkg-price">249 ₺<span style="font-size:14px;">/yıl</span></div>
+        <div class="pkg-price">${priceLabel}<span style="font-size:14px;">/yıl</span></div>
         <ul class="pkg-features">
           <li>10 araca kadar kayıt (ücretsizde 1)</li>
           <li>Sınırsız belge yükleme</li>
@@ -2482,12 +2539,15 @@ function renderPackagesScreen(){
           <li>Bildirim ve hatırlatmalar</li>
           <li class="pkg-soon">Yapay Zeka Destekli Belge Analizi (yakında)</li>
         </ul>
-        ${isProBireysel ? `<div class="pkg-current">✓ Pro Sürüm Aktif</div>` : `<button class="pkg-buy-btn" disabled>Yakında</button>`}
+        ${isProBireysel
+          ? `<div class="pkg-current">✓ Pro Sürüm Aktif</div><button class="change-mode-link" style="display:block; text-align:center; margin-top:8px;" onclick="openManageSubscriptions()">Aboneliği Yönet / İptal Et</button>`
+          : `<button class="pkg-buy-btn" ${buyDisabled ? 'disabled' : ''} onclick="purchaseBireyselPro()">${buyDisabled ? 'Yakında' : 'Satın Al'}</button>`}
       </div>`;
     el.innerHTML = `
       <h2>⭐ Bireysel Pro</h2>
       <p style="font-size:13px; color:var(--muted); margin:0 0 16px;">Ücretsiz sürümde 1 araca kadar kayıt yapabilirsin.</p>
       ${cardHtml}
+      ${restoreHtml}
       ${privacyHtml}
       ${contactHtml}
       <div class="modal-actions"><button class="btn-secondary" onclick="closePackagesScreen()">Kapat</button></div>
@@ -2495,30 +2555,85 @@ function renderPackagesScreen(){
   }
 }
 
-function openPackagesScreen(){
-  renderPackagesScreen();
+async function openPackagesScreen(){
   document.getElementById('packagesOverlay').classList.add('open');
+  renderPackagesScreen();
+  await loadIAPProducts();
+  renderPackagesScreen();
 }
 
 async function purchaseBireyselPro(){
-  // Real payment (Apple In-App Purchase / StoreKit) ships in a later update.
-  // v1 is free — do not simulate a purchase or unlock here.
-  alert('Pro sürüm yakında App Store üzerinden satın alınabilir olacak.');
+  if(!hasNativeIAP()){
+    alert('Satın alma sadece gerçek iPhone üzerinde, App Store üzerinden yapılabilir.');
+    return;
+  }
+  try{
+    const res = await window.Capacitor.Plugins.IAPPurchases.purchase({productId: IAP_PRODUCT_IDS.bireyselPro});
+    if(res.status === 'success'){
+      isProBireysel = true;
+      await saveProStatus();
+      renderPackagesScreen();
+      render();
+      alert('Bireysel Pro aktif edildi! Artık 10 araca kadar kayıt yapabilirsin.');
+    } else if(res.status === 'pending'){
+      alert('Satın alma onay bekliyor (Aile Onayı gerekebilir). Onaylanınca otomatik olarak aktif olacak.');
+    }
+    // 'cancelled': user backed out of the sheet themselves, no alert needed.
+  }catch(e){
+    alert('Satın alma sırasında bir sorun oluştu: ' + (e && e.message ? e.message : 'Bilinmeyen hata'));
+  }
 }
 
 async function selectKurumsalTier(tier){
-  // Real payment (Apple In-App Purchase / StoreKit) ships in a later update.
-  // v1 is free — do not simulate a purchase or unlock here.
-  alert('Kurumsal abonelikler yakında App Store üzerinden satın alınabilir olacak.');
+  const productId = tier === '25' ? IAP_PRODUCT_IDS.kurumsal25
+    : tier === '75' ? IAP_PRODUCT_IDS.kurumsal75
+    : tier === '200' ? IAP_PRODUCT_IDS.kurumsal200
+    : null;
+  if(!productId) return;
+  if(!hasNativeIAP()){
+    alert('Satın alma sadece gerçek iPhone üzerinde, App Store üzerinden yapılabilir.');
+    return;
+  }
+  try{
+    const res = await window.Capacitor.Plugins.IAPPurchases.purchase({productId});
+    if(res.status === 'success'){
+      kurumsalTier = tier;
+      await saveProStatus();
+      renderPackagesScreen();
+      render();
+      alert('Abonelik aktif edildi!');
+    } else if(res.status === 'pending'){
+      alert('Satın alma onay bekliyor. Onaylanınca otomatik olarak aktif olacak.');
+    }
+  }catch(e){
+    alert('Satın alma sırasında bir sorun oluştu: ' + (e && e.message ? e.message : 'Bilinmeyen hata'));
+  }
 }
 
-async function cancelKurumsalSubscription(){
-  if(!confirm('Kurumsal aboneliğini iptal etmek istediğine emin misin? Araç sayın seçtiğin paketin sınırını aşarsa yeni araç ekleyemezsin.')) return;
-  kurumsalTier = null;
-  await saveProStatus();
+// Apple doesn't let apps cancel a subscription programmatically — cancellation
+// only happens through Apple's own "Manage Subscriptions" sheet or Settings.
+async function openManageSubscriptions(){
+  if(!hasNativeIAP()){
+    alert('Abonelik yönetimi sadece gerçek iPhone üzerinden yapılabilir.');
+    return;
+  }
+  try{
+    await window.Capacitor.Plugins.IAPPurchases.showManageSubscriptions();
+  }catch(e){}
+  await syncEntitlementsFromStore();
   renderPackagesScreen();
   render();
-  alert('Abonelik iptal edildi.');
+}
+
+async function restoreIAPPurchases(){
+  if(!hasNativeIAP()) return;
+  try{
+    await window.Capacitor.Plugins.IAPPurchases.restorePurchases();
+  }catch(e){}
+  await syncEntitlementsFromStore();
+  renderPackagesScreen();
+  render();
+  alert('Satın almalar kontrol edildi.');
 }
 
 async function checkOnboarding(){
@@ -2571,6 +2686,7 @@ async function applyAccountType(){
   }
   switchTab('dashboard'); setDrawerActive('home');
   await loadProStatus();
+  await syncEntitlementsFromStore();
   await loadVehicles();
   if(accountType === 'kurumsal' && !kurumsalTier){
     openPackagesScreen();
