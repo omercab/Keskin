@@ -3094,7 +3094,7 @@ loadDarkModePref();
     }
   };
 
-  function addBackupSettings(){const groups=document.querySelectorAll('#settingsOverlay .settings-group');if(!groups.length||document.getElementById('gbBackupBox'))return;const box=document.createElement('div');box.id='gbBackupBox';box.className='gb-backup-box';box.innerHTML='<strong>☁️ Taşınabilir Tam Yedek</strong><span>Araçlar, yakıt, masraflar, etiketler ve tüm yerel kayıtları tek dosyada saklar. Otomatik bulut eşitleme için ileride kullanıcı hesabı ve sunucu bağlantısı gerekir.</span><div class="gb-action-row"><button onclick="exportFullBackup()">Tam Yedek Al</button><button class="secondary" onclick="document.getElementById(\'gbBackupInput\').click()">Yedeği Geri Yükle</button><input id="gbBackupInput" type="file" accept="application/json,.json" hidden onchange="importFullBackup(event)"></div>';groups[groups.length-1].appendChild(box);}
+  function addBackupSettings(){const sections=document.querySelectorAll('#settingsOverlay .settings-section');if(!sections.length||document.getElementById('gbBackupBox'))return;const target=Array.from(sections).find(s=>{const t=s.querySelector('.settings-section-title');return t&&t.textContent.trim()==='Veriler';})||sections[sections.length-1];const box=document.createElement('div');box.id='gbBackupBox';box.className='gb-backup-box';box.innerHTML='<strong>☁️ Taşınabilir Tam Yedek</strong><span>Araçlar, yakıt, masraflar, etiketler, belgeler/fotoğraflar ve tüm yerel kayıtları tek dosyada saklar. Otomatik bulut eşitleme için ileride kullanıcı hesabı ve sunucu bağlantısı gerekir.</span><div class="gb-action-row"><button onclick="exportFullBackup()">Tam Yedek Al</button><button class="secondary" onclick="document.getElementById(\'gbBackupInput\').click()">Yedeği Geri Yükle</button><input id="gbBackupInput" type="file" accept="application/json,.json" hidden onchange="importFullBackup(event)"></div>';target.appendChild(box);}
   const oldOpenSettings=window.openSettings;window.openSettings=function(){oldOpenSettings();addBackupSettings();};
   window.showAboutGarageBook=function(){alert('Garage Book v2.0\\n\\nBireysel araç sahipleri ve 200 araca kadar filolar için araç, belge, bakım, yakıt, masraf ve raporlama uygulaması. Veriler bu cihazda saklanır; tam yedek dosyasıyla taşınabilir.');};
   ensureAdvancedFilters();render();
@@ -3232,8 +3232,10 @@ loadDarkModePref();
     window.openGarageBookGuide=()=>{el.classList.add('open');el.setAttribute('aria-hidden','false');};
   }
   function addHelpToSettings(){
-    const groups=document.querySelectorAll('#settingsOverlay .settings-group'); if(!groups.length||document.getElementById('gbGuideSetting')) return;
-    const btn=document.createElement('button');btn.type='button';btn.id='gbGuideSetting';btn.className='settings-row';btn.innerHTML='<span class="settings-row-icon">❓</span><span class="settings-row-copy"><strong>Kısa Kullanım Rehberi</strong><small>Garage Book’u sade şekilde kullan</small></span><span>›</span>';btn.onclick=()=>window.openGarageBookGuide?.();groups[groups.length-1].appendChild(btn);
+    const sections=document.querySelectorAll('#settingsOverlay .settings-section'); if(!sections.length||document.getElementById('gbGuideSetting')) return;
+    const lastSection=sections[sections.length-1];
+    const list=lastSection.querySelector('.settings-list')||lastSection;
+    const btn=document.createElement('button');btn.type='button';btn.id='gbGuideSetting';btn.className='settings-row';btn.innerHTML='<span class="settings-row-icon">❓</span><span class="settings-row-copy"><strong>Kısa Kullanım Rehberi</strong><small>Garage Book’u sade şekilde kullan</small></span><span>›</span>';btn.onclick=()=>window.openGarageBookGuide?.();list.appendChild(btn);
   }
   function observe(){
     const task=document.getElementById('dashboardTasks'); if(task)new MutationObserver(()=>simplifyTasks()).observe(task,{childList:true,subtree:false});
