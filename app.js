@@ -2144,7 +2144,27 @@ async function deleteVehicle(){
   closeModal();
 }
 
-function generatePdfReport(){
+// jsPDF's doc.save() / SheetJS's XLSX.writeFile() both trigger downloads via a
+// hidden <a download> click on a blob: URL — this works in real browsers but is
+// silently a no-op in Capacitor's bare WKWebView (no download manager), which is
+// why "PDF Rapor İndir"/"Excel'e Aktar" appeared to do nothing on a real device.
+// Native builds instead write the file via Filesystem and hand it to the OS
+// share sheet, so the user can save/AirDrop/email it.
+function hasNativeFilesystem(){
+  return !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem && window.Capacitor.Plugins.Share);
+}
+async function saveAndShareNative(base64Data, fileName){
+  try{
+    const { Filesystem, Share } = window.Capacitor.Plugins;
+    const writeRes = await Filesystem.writeFile({ path: fileName, data: base64Data, directory: 'CACHE' });
+    await Share.share({ title: fileName, url: writeRes.uri });
+  }catch(e){
+    if(e && e.message === 'Share canceled'){ return; }
+    alert('Dosya paylaşılırken bir sorun oluştu: ' + (e && e.message ? e.message : 'Bilinmeyen hata'));
+  }
+}
+
+async function generatePdfReport(){
   if(typeof window.jspdf === 'undefined'){
     alert('PDF oluşturucu yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.');
     return;
@@ -2245,7 +2265,14 @@ function generatePdfReport(){
     doc.text(`Garaj Defteri  ·  Sayfa ${i}/${pageCount}`, pageWidth / 2, 290, {align:'center'});
   }
 
-  doc.save('garaj-defteri-raporu.pdf');
+  const pdfFileName = 'garaj-defteri-raporu.pdf';
+  if(hasNativeFilesystem()){
+    const dataUri = doc.output('datauristring');
+    const base64 = dataUri.slice(dataUri.indexOf(',') + 1);
+    await saveAndShareNative(base64, pdfFileName);
+  } else {
+    doc.save(pdfFileName);
+  }
 }
 
 function toDateStr(val){
@@ -2262,7 +2289,7 @@ function toDateStr(val){
   return String(val);
 }
 
-function exportToExcel(){
+async function exportToExcel(){
   if(typeof XLSX === 'undefined'){
     alert('Excel modülü yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.');
     return;
@@ -2299,7 +2326,13 @@ function exportToExcel(){
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Araclar');
-  XLSX.writeFile(wb, 'garaj-defteri-yedek.xlsx');
+  const xlsxFileName = 'garaj-defteri-yedek.xlsx';
+  if(hasNativeFilesystem()){
+    const base64 = XLSX.write(wb, {bookType:'xlsx', type:'base64'});
+    await saveAndShareNative(base64, xlsxFileName);
+  } else {
+    XLSX.writeFile(wb, xlsxFileName);
+  }
 }
 
 async function deleteAllVehicles(){
