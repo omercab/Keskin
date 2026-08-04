@@ -42,7 +42,7 @@ Girdiğiniz tüm bilgiler yalnızca kendi telefonunuzda saklanır. Hiçbir veri 
 • Sigorta, kasko, muayene (vize) ve bakım tarihi takibi
 • Belge ve fotoğraf saklama (poliçe, ruhsat, fatura vb.)
 • Yaklaşan işlemler için akıllı hatırlatmalar
-• PDF ve Excel'e dışa aktarma
+• PDF rapor ve tam yedek olarak dışa aktarma
 • Karanlık mod desteği
 • Bireysel ve kurumsal (filo) kullanım modları
 

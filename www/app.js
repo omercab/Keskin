@@ -2275,66 +2275,6 @@ async function generatePdfReport(){
   }
 }
 
-function toDateStr(val){
-  if(val === null || val === undefined || val === '') return '';
-  if(val instanceof Date){
-    const off = val.getTimezoneOffset();
-    const d2 = new Date(val.getTime() - off * 60000);
-    return d2.toISOString().slice(0,10);
-  }
-  if(typeof val === 'number' && typeof XLSX !== 'undefined' && XLSX.SSF){
-    const d = XLSX.SSF.parse_date_code(val);
-    if(d) return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
-  }
-  return String(val);
-}
-
-async function exportToExcel(){
-  if(typeof XLSX === 'undefined'){
-    alert('Excel modülü yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.');
-    return;
-  }
-  if(vehicles.length === 0){
-    alert('Dışa aktarılacak araç bulunamadı.');
-    return;
-  }
-  const rows = vehicles.map(v=>({
-    Plaka: v.plate || '',
-    Tur: v.type || '',
-    Marka: v.brand || '',
-    Model: v.model || '',
-    Yil: v.year || '',
-    KM: v.kmGuncel || '',
-    Durum: v.status || 'aktif',
-    Renk: v.color || '',
-    SigortaFirma: v.sigorta.company || '',
-    SigortaBaslangic: v.sigorta.startDate || '',
-    SigortaBitis: v.sigorta.date || '',
-    SigortaTutar: v.sigorta.amount || '',
-    KaskoFirma: v.kasko.company || '',
-    KaskoBaslangic: v.kasko.startDate || '',
-    KaskoBitis: v.kasko.date || '',
-    KaskoTutar: v.kasko.amount || '',
-    BakimTarih: v.bakim.date || '',
-    BakimSonraki: v.bakim.nextDate || '',
-    BakimTutar: v.bakim.amount || '',
-    BakimNot: v.bakim.note || '',
-    VizeBitis: v.vize.date || '',
-    Not: v.note || '',
-    Gecmis: JSON.stringify(v.history || []),
-  }));
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Araclar');
-  const xlsxFileName = 'garaj-defteri-yedek.xlsx';
-  if(hasNativeFilesystem()){
-    const base64 = XLSX.write(wb, {bookType:'xlsx', type:'base64'});
-    await saveAndShareNative(base64, xlsxFileName);
-  } else {
-    XLSX.writeFile(wb, xlsxFileName);
-  }
-}
-
 async function deleteAllVehicles(){
   if(vehicles.length === 0){
     alert('Silinecek araç yok.');
@@ -2356,67 +2296,6 @@ async function deleteAllVehicles(){
   if(activeTab === 'documents') renderDocumentsTab();
   if(activeTab === 'analytics') renderAnalyticsTab();
   alert(`${count} araç silindi.`);
-}
-
-async function handleExcelImport(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  if(typeof XLSX === 'undefined'){
-    alert('Excel modülü yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.');
-    e.target.value = '';
-    return;
-  }
-  try{
-    const buf = await file.arrayBuffer();
-    const wb = XLSX.read(buf, {type:'array'});
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
-    if(rows.length === 0){
-      alert('Dosyada okunacak veri bulunamadı.');
-      e.target.value = '';
-      return;
-    }
-    if(!confirm(`${rows.length} araç bulundu. Bunlar mevcut listene EK olarak eklenecek (hiçbir şeyin üzerine yazılmaz). Devam edilsin mi?`)){
-      e.target.value = '';
-      return;
-    }
-
-    let importedCount = 0;
-    rows.forEach(r=>{
-      if(!r.Plaka) return;
-      let history = [];
-      try{ history = JSON.parse(r.Gecmis || '[]'); }catch(err){ history = []; }
-      vehicles.push({
-        id: genId(),
-        plate: String(r.Plaka || '').toUpperCase(),
-        type: String(r.Tur || 'otomobil'),
-        brand: String(r.Marka || ''),
-        model: String(r.Model || ''),
-        year: String(r.Yil || ''),
-        kmGuncel: String(r.KM || ''),
-        status: r.Durum === 'pasif' ? 'pasif' : 'aktif',
-        color: String(r.Renk || ''),
-        note: String(r.Not || ''),
-        sigorta: {company: String(r.SigortaFirma || ''), startDate: toDateStr(r.SigortaBaslangic), date: toDateStr(r.SigortaBitis), amount: String(r.SigortaTutar || '')},
-        kasko: {company: String(r.KaskoFirma || ''), startDate: toDateStr(r.KaskoBaslangic), date: toDateStr(r.KaskoBitis), amount: String(r.KaskoTutar || '')},
-        bakim: {date: toDateStr(r.BakimTarih), nextDate: toDateStr(r.BakimSonraki), amount: String(r.BakimTutar || ''), note: String(r.BakimNot || '')},
-        vize: {date: toDateStr(r.VizeBitis)},
-        docs: {sigorta:null, kasko:null, bakim:null, vize:null, ruhsat:null},
-        history,
-      });
-      importedCount++;
-    });
-
-    await persist();
-    await rescheduleAllReminders();
-    render();
-    if(activeTab === 'documents') renderDocumentsTab();
-    if(activeTab === 'analytics') renderAnalyticsTab();
-    alert(`${importedCount} araç başarıyla içe aktarıldı.`);
-  }catch(err){
-    alert('Excel dosyası okunamadı. Dosyanın bu uygulamadan alınmış bir yedek olduğundan emin ol.');
-  }
-  e.target.value = '';
 }
 
 let isProBireysel = false;
@@ -2529,9 +2408,9 @@ function renderPackagesScreen(){
 
   if(accountType === 'kurumsal'){
     const tiers = [
-      {key:'25', productId: IAP_PRODUCT_IDS.kurumsal25, label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'75', productId: IAP_PRODUCT_IDS.kurumsal75, label:'Kurumsal Standart', price:'1.999 ₺', features:['75 araca kadar kayıt','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'200', productId: IAP_PRODUCT_IDS.kurumsal200, label:'Kurumsal Plus', price:'4.999 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF ve Excel dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'25', productId: IAP_PRODUCT_IDS.kurumsal25, label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'75', productId: IAP_PRODUCT_IDS.kurumsal75, label:'Kurumsal Standart', price:'1.999 ₺', features:['75 araca kadar kayıt','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'200', productId: IAP_PRODUCT_IDS.kurumsal200, label:'Kurumsal Plus', price:'4.999 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar']},
     ];
     const cardsHtml = tiers.map(t=>{
       const isCurrent = kurumsalTier === t.key;
@@ -2577,7 +2456,7 @@ function renderPackagesScreen(){
         <ul class="pkg-features">
           <li>10 araca kadar kayıt (ücretsizde 1)</li>
           <li>Sınırsız belge yükleme</li>
-          <li>PDF ve Excel dışa aktarma</li>
+          <li>PDF rapor dışa aktarma</li>
           <li>Bildirim ve hatırlatmalar</li>
           <li class="pkg-soon">Yapay Zeka Destekli Belge Analizi (yakında)</li>
         </ul>
