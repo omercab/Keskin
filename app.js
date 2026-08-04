@@ -2496,6 +2496,7 @@ async function purchaseBireyselPro(){
       isProBireysel = true;
       await saveProStatus();
       renderPackagesScreen();
+      renderProfileBadge();
       render();
       alert('Bireysel Pro aktif edildi! Artık 10 araca kadar kayıt yapabilirsin.');
     } else if(res.status === 'pending'){
@@ -2524,6 +2525,7 @@ async function selectKurumsalTier(tier){
       kurumsalTier = tier;
       await saveProStatus();
       renderPackagesScreen();
+      renderProfileBadge();
       render();
       alert('Abonelik aktif edildi!');
     } else if(res.status === 'pending'){
@@ -2546,6 +2548,7 @@ async function openManageSubscriptions(){
   }catch(e){}
   await syncEntitlementsFromStore();
   renderPackagesScreen();
+  renderProfileBadge();
   render();
 }
 
@@ -2556,6 +2559,7 @@ async function restoreIAPPurchases(){
   }catch(e){}
   await syncEntitlementsFromStore();
   renderPackagesScreen();
+  renderProfileBadge();
   render();
   alert('Satın almalar kontrol edildi.');
 }
@@ -2599,6 +2603,25 @@ async function resetAccountType(){
   accountType = null;
   document.getElementById('onboarding').style.display = 'flex';
 }
+const KURUMSAL_TIER_LABELS = {'25':'Kurumsal Başlangıç', '75':'Kurumsal Standart', '200':'Kurumsal Plus'};
+
+// The app never collects the user's name, so the drawer/settings "profile" card
+// can't show one — it reflects account type + real subscription status instead.
+function renderProfileBadge(){
+  const isKurumsal = accountType === 'kurumsal';
+  const avatarIcon = isKurumsal ? '🏢' : '🚗';
+  const nameLabel = isKurumsal ? 'Kurumsal Hesap' : 'Bireysel Hesap';
+  let planLabel = 'Ücretsiz Üye';
+  if(isKurumsal){
+    planLabel = kurumsalTier ? (KURUMSAL_TIER_LABELS[kurumsalTier] || 'Ücretsiz Üye') : 'Ücretsiz Üye';
+  } else if(isProBireysel){
+    planLabel = '⭐ Pro Üye';
+  }
+  ['settingsAvatar','drawerAvatar'].forEach(id=>{ const el = document.getElementById(id); if(el) el.textContent = avatarIcon; });
+  ['settingsProfileName','drawerProfileName'].forEach(id=>{ const el = document.getElementById(id); if(el) el.textContent = nameLabel; });
+  ['settingsProfilePlan','drawerPlanLabel'].forEach(id=>{ const el = document.getElementById(id); if(el) el.textContent = planLabel; });
+}
+
 async function applyAccountType(){
   const title = document.getElementById('appTitle');
   const eyebrow = document.getElementById('appEyebrow');
@@ -2611,6 +2634,7 @@ async function applyAccountType(){
   switchTab('dashboard'); setDrawerActive('home');
   await loadProStatus();
   await syncEntitlementsFromStore();
+  renderProfileBadge();
   await loadVehicles();
   if(accountType === 'kurumsal' && !kurumsalTier){
     openPackagesScreen();
