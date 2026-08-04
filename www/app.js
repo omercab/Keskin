@@ -2404,17 +2404,23 @@ function hasNativeIAP(){
 // Apple requires the price you display to match what StoreKit reports, so
 // renderPackagesScreen() prefers this over the hardcoded fallback text.
 let iapProductsCache = null;
+function iapDebugLog(text){
+  try{ window.Capacitor.Plugins.IAPPurchases.debugLog({text}); }catch(e){}
+}
 async function loadIAPProducts(){
+  iapDebugLog('hasNativeIAP=' + hasNativeIAP());
   if(!hasNativeIAP()) return {};
   if(iapProductsCache) return iapProductsCache;
   try{
     const ids = Object.values(IAP_PRODUCT_IDS);
+    iapDebugLog('calling getProducts ' + JSON.stringify(ids));
     const res = await window.Capacitor.Plugins.IAPPurchases.getProducts({productIds: ids});
+    iapDebugLog('getProducts result ' + JSON.stringify(res));
     const map = {};
     (res.products || []).forEach(p => { map[p.id] = p; });
     iapProductsCache = map;
     return map;
-  }catch(e){ return {}; }
+  }catch(e){ iapDebugLog('getProducts error ' + (e && e.message)); return {}; }
 }
 
 // Reconciles local Pro/Kurumsal flags with Apple's actual subscription state
@@ -2425,6 +2431,7 @@ async function syncEntitlementsFromStore(){
   if(!hasNativeIAP()) return;
   try{
     const res = await window.Capacitor.Plugins.IAPPurchases.getActiveEntitlements();
+    iapDebugLog('syncEntitlementsFromStore result ' + JSON.stringify(res));
     const active = new Set(res.activeProductIds || []);
     isProBireysel = active.has(IAP_PRODUCT_IDS.bireyselPro);
     if(active.has(IAP_PRODUCT_IDS.kurumsal200)) kurumsalTier = '200';
@@ -2432,7 +2439,7 @@ async function syncEntitlementsFromStore(){
     else if(active.has(IAP_PRODUCT_IDS.kurumsal25)) kurumsalTier = '25';
     else kurumsalTier = null;
     await saveProStatus();
-  }catch(e){}
+  }catch(e){ iapDebugLog('syncEntitlementsFromStore error ' + (e && e.message)); }
 }
 
 function proStatusKey(){
@@ -2568,7 +2575,9 @@ async function purchaseBireyselPro(){
     return;
   }
   try{
+    iapDebugLog('purchase() calling for ' + IAP_PRODUCT_IDS.bireyselPro);
     const res = await window.Capacitor.Plugins.IAPPurchases.purchase({productId: IAP_PRODUCT_IDS.bireyselPro});
+    iapDebugLog('purchase() result ' + JSON.stringify(res));
     if(res.status === 'success'){
       isProBireysel = true;
       await saveProStatus();
@@ -2580,6 +2589,7 @@ async function purchaseBireyselPro(){
     }
     // 'cancelled': user backed out of the sheet themselves, no alert needed.
   }catch(e){
+    iapDebugLog('purchase() error ' + (e && e.message));
     alert('Satın alma sırasında bir sorun oluştu: ' + (e && e.message ? e.message : 'Bilinmeyen hata'));
   }
 }

@@ -11,8 +11,26 @@ public class IAPPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "restorePurchases", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getActiveEntitlements", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "showManageSubscriptions", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "showManageSubscriptions", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "debugLog", returnType: CAPPluginReturnPromise)
     ]
+
+    @objc func debugLog(_ call: CAPPluginCall) {
+        let text = call.getString("text") ?? ""
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let file = dir.appendingPathComponent("iap-debug.log")
+        let line = "\(Date()): \(text)\n"
+        if let data = line.data(using: .utf8) {
+            if FileManager.default.fileExists(atPath: file.path), let handle = try? FileHandle(forWritingTo: file) {
+                handle.seekToEndOfFile()
+                handle.write(data)
+                handle.closeFile()
+            } else {
+                try? data.write(to: file)
+            }
+        }
+        call.resolve()
+    }
 
     private var updatesTask: Task<Void, Never>?
 
