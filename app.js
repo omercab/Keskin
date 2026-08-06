@@ -2330,7 +2330,10 @@ async function loadIAPProducts(){
     iapDebugLog('getProducts result ' + JSON.stringify(res));
     const map = {};
     (res.products || []).forEach(p => { map[p.id] = p; });
-    iapProductsCache = map;
+    // Only cache a non-empty result — an empty list usually means a transient
+    // StoreKit hiccup, not "no products exist". Caching it would permanently
+    // block retries (e.g. reopening the packages screen) for the rest of the session.
+    if(Object.keys(map).length > 0) iapProductsCache = map;
     return map;
   }catch(e){ iapDebugLog('getProducts error ' + (e && e.message)); return {}; }
 }
@@ -2406,6 +2409,13 @@ function renderPackagesScreen(){
     ? `<button class="change-mode-link" style="display:block; text-align:center; width:100%; margin-top:4px;" onclick="restoreIAPPurchases()">Satın Almaları Geri Yükle</button>`
     : '';
 
+  // If we're on a real device but StoreKit hasn't returned any products yet
+  // (still loading, or a transient fetch failure), offer a manual retry
+  // instead of leaving the buttons permanently stuck on "Yakında".
+  const productsMissingHtml = (hasNativeIAP() && (!iapProductsCache || Object.keys(iapProductsCache).length === 0))
+    ? `<div class="pkg-contact">Fiyatlar yüklenemedi.<br><a href="#" onclick="event.preventDefault();retryLoadIAPProducts();">Tekrar Dene</a></div>`
+    : '';
+
   if(accountType === 'kurumsal'){
     const tiers = [
       {key:'25', productId: IAP_PRODUCT_IDS.kurumsal25, label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar']},
@@ -2440,6 +2450,7 @@ function renderPackagesScreen(){
         <ul class="pkg-features"><li>Büyük filolar için özel teklif</li></ul>
         <a class="pkg-buy-btn" style="display:block; text-align:center; text-decoration:none;" href="${mailto}">Bize Ulaşın</a>
       </div>
+      ${productsMissingHtml}
       ${restoreHtml}
       ${privacyHtml}
       ${contactHtml}
@@ -2468,12 +2479,19 @@ function renderPackagesScreen(){
       <h2>⭐ Bireysel Pro</h2>
       <p style="font-size:13px; color:var(--muted); margin:0 0 16px;">Ücretsiz sürümde 1 araca kadar kayıt yapabilirsin.</p>
       ${cardHtml}
+      ${productsMissingHtml}
       ${restoreHtml}
       ${privacyHtml}
       ${contactHtml}
       <div class="modal-actions"><button class="btn-secondary" onclick="closePackagesScreen()">Kapat</button></div>
     `;
   }
+}
+
+async function retryLoadIAPProducts(){
+  iapProductsCache = null;
+  await loadIAPProducts();
+  renderPackagesScreen();
 }
 
 async function openPackagesScreen(){

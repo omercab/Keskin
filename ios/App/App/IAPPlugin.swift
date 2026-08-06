@@ -58,20 +58,38 @@ public class IAPPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         Task {
-            do {
-                let products = try await Product.products(for: ids)
-                let list = products.map { p -> [String: Any] in
-                    return [
-                        "id": p.id,
-                        "displayName": p.displayName,
-                        "description": p.description,
-                        "displayPrice": p.displayPrice,
-                        "price": NSDecimalNumber(decimal: p.price).doubleValue
-                    ]
+            // StoreKit's Product.products(for:) can transiently return an error or an
+            // empty list right after launch (seen in App Review's sandbox) even though
+            // the products are correctly configured — retry a few times before giving up.
+            var lastError: Error?
+            for attempt in 1...3 {
+                do {
+                    let products = try await Product.products(for: ids)
+                    if !products.isEmpty {
+                        let list = products.map { p -> [String: Any] in
+                            return [
+                                "id": p.id,
+                                "displayName": p.displayName,
+                                "description": p.description,
+                                "displayPrice": p.displayPrice,
+                                "price": NSDecimalNumber(decimal: p.price).doubleValue
+                            ]
+                        }
+                        call.resolve(["products": list])
+                        return
+                    }
+                    lastError = nil
+                } catch {
+                    lastError = error
                 }
-                call.resolve(["products": list])
-            } catch {
-                call.reject("Ürünler alınamadı: \(error.localizedDescription)")
+                if attempt < 3 {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                }
+            }
+            if let lastError {
+                call.reject("Ürünler alınamadı: \(lastError.localizedDescription)")
+            } else {
+                call.resolve(["products": []])
             }
         }
     }
