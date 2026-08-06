@@ -2000,7 +2000,17 @@ function setCardStatus(cat, text, level){
 function showUploadSpinner(){ document.getElementById('uploadOverlay').style.display = 'flex'; }
 function hideUploadSpinner(){ document.getElementById('uploadOverlay').style.display = 'none'; }
 
-function viewDataUri(base64, mediaType){
+async function viewDataUri(base64, mediaType){
+  // Blob + window.open(url,'_blank') is a browser-only pattern — it silently
+  // does nothing in Capacitor's native WKWebView (same root cause as the
+  // PDF/Excel/backup download bug fixed earlier). On native, write the file
+  // and hand it to the OS share sheet instead, which previews it.
+  if(hasNativeFilesystem()){
+    const extByType = {'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png','image/heic':'heic','image/webp':'webp'};
+    const ext = extByType[mediaType] || (mediaType && mediaType.split('/')[1]) || 'bin';
+    await saveAndShareNative(base64, 'belge.' + ext);
+    return;
+  }
   try{
     const byteChars = atob(base64);
     const byteNumbers = new Array(byteChars.length);
