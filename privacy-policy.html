@@ -18,44 +18,55 @@
   .badge{display:inline-block;background:#eef6ee;color:#2f7a3a;font-size:13px;font-weight:600;padding:6px 12px;border-radius:20px;margin-bottom:20px;}
   a{color:var(--orange);}
   footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;}
+  footer a{color:var(--muted);text-decoration:underline;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>Garage Book — Gizlilik Politikası</h1>
-    <p class="updated">Son güncelleme: 31 Temmuz 2026</p>
+    <p class="updated">Son güncelleme: 8 Ağustos 2026</p>
   </header>
 
-  <div class="badge">🔒 Verileriniz yalnızca cihazınızda saklanır</div>
+  <div class="badge">🔒 Verileriniz varsayılan olarak yalnızca cihazınızda saklanır</div>
 
-  <p>Garage Book ("Uygulama"), araçlarınızın sigorta, kasko, muayene (vize) ve bakım tarihlerini takip etmenizi sağlayan bir mobil uygulamadır. Bu politika, uygulamayı kullanırken hangi bilgilerin nasıl işlendiğini açıklar.</p>
+  <p>Garage Book ("Uygulama"), araçlarınızın sigorta, kasko, muayene ve bakım tarihlerini takip etmenizi sağlayan bir mobil uygulamadır. Bu politika, uygulamayı kullanırken hangi bilgilerin nasıl işlendiğini açıklar.</p>
 
   <h2>1. Hangi verileri topluyoruz?</h2>
   <p>Garage Book'un bir sunucusu veya arka planda çalışan bir veritabanı yoktur. Uygulamaya girdiğiniz tüm bilgiler — araç plakası, marka/model, sigorta ve muayene tarihleri, yüklediğiniz belge/fotoğraflar, bakım notları — yalnızca kendi telefonunuzun hafızasında saklanır.</p>
-  <p>Bu bilgiler hiçbir şekilde bize, üçüncü bir şirkete veya başka bir kullanıcıya gönderilmez, bir sunucuya yüklenmez.</p>
+  <p>Bu bilgiler, aşağıda 3. maddede açıklanan Yapay Zeka Destekli Belge Analizi özelliği dışında, hiçbir şekilde bize, üçüncü bir şirkete veya başka bir kullanıcıya gönderilmez, bir sunucuya yüklenmez.</p>
 
   <h2>2. Kamera ve fotoğraf erişimi</h2>
-  <p>Belge (ruhsat, sigorta poliçesi, muayene raporu vb.) eklerken cihazınızdaki fotoğraf galerisine erişim izni isteyebiliriz. Seçtiğiniz görsel yalnızca uygulama içinde, cihazınızda saklanır; herhangi bir sunucuya aktarılmaz.</p>
+  <p>Belge (ruhsat, sigorta poliçesi, muayene raporu vb.) eklerken cihazınızdaki fotoğraf galerisine veya kameraya erişim izni isteyebiliriz. Seçtiğiniz görsel, aşağıda açıklanan Yapay Zeka Destekli Belge Analizi kullanılmadığı sürece yalnızca uygulama içinde, cihazınızda saklanır; herhangi bir sunucuya aktarılmaz.</p>
 
-  <h2>3. Üçüncü taraf servisler</h2>
+  <h2>3. Yapay Zeka Destekli Belge Analizi (yalnızca Pro/Kurumsal üyeler)</h2>
+  <p>Bireysel Pro veya Kurumsal pakete sahip üyeler, yüklediği belge fotoğraflarının otomatik olarak okunmasını sağlayan bir özellik kullanabilir. Bu özellik açıkça kullanıldığında (belge fotoğrafı yüklendiğinde), fotoğraf bilgiyi çıkarmak amacıyla Google'ın Gemini API servisine güvenli bir bağlantı üzerinden gönderilir ve işlendikten sonra Google'ın kendi veri saklama politikalarına tabi olur (bkz. <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">ai.google.dev/gemini-api/terms</a>). Bu istek, Majka Solutions'a ait bir sunucu üzerinden (kimliğinizi veya hesap bilginizi içermeden) yönlendirilir; belge, Majka Solutions tarafından ayrıca saklanmaz.</p>
+  <p>Bu özellik yalnızca siz bir belge fotoğrafı yüklediğinizde çalışır; ücretsiz üyelikte veya bu özelliği kullanmadığınızda hiçbir belge cihazınızdan çıkmaz (bkz. 1. ve 2. madde).</p>
+
+  <h2>4. Bildirimler</h2>
+  <p>Yaklaşan sigorta, kasko, muayene ve bakım tarihleri için isteğe bağlı olarak cihazınıza yerel bildirim gönderebiliriz. Bu bildirimler tamamen cihazınızda hesaplanır ve planlanır; bir sunucudan gönderilmez.</p>
+
+  <h2>5. Satın alımlar (Bireysel Pro / Kurumsal paketler)</h2>
+  <p>Uygulama içi abonelikler tamamen Apple'ın App Store altyapısı (StoreKit) üzerinden işlenir. Ödeme ve fatura bilgileriniz Apple tarafından yönetilir; Majka Solutions bu bilgilere erişmez veya bunları saklamaz. Aboneliğinizin aktif olup olmadığı bilgisi yalnızca cihazınızda doğrulanır.</p>
+
+  <h2>6. Diğer üçüncü taraf servisler</h2>
   <p>PDF belgelerini görüntüleme özelliği için, uygulama açık kaynaklı bir kütüphaneyi (PDF.js) bir içerik dağıtım ağı (CDN) üzerinden yükler. Bu istek sırasında yalnızca teknik bağlantı bilgileri (ör. IP adresi) ilgili CDN sağlayıcısı tarafından görülebilir; araç veya kişisel verileriniz bu istekle birlikte gönderilmez.</p>
   <p>Uygulama; reklam ağı, analitik/izleme SDK'sı veya kullanıcı davranışı takip sistemi <strong>kullanmaz</strong>.</p>
 
-  <h2>4. Veri silme ve yedekleme</h2>
+  <h2>7. Veri silme ve yedekleme</h2>
   <p>Uygulama içindeki tüm verileri istediğiniz zaman silebilirsiniz. Uygulamayı cihazınızdan kaldırdığınızda, verileriniz de cihazınızla birlikte silinir. Uygulama içindeki yedekleme özelliğini kullanarak verilerinizi dışa aktarıp güvenli bir şekilde saklayabilirsiniz.</p>
 
-  <h2>5. Çocukların gizliliği</h2>
+  <h2>8. Çocukların gizliliği</h2>
   <p>Garage Book, 13 yaş altındaki çocuklardan bilerek veri toplamaz ve onlara yönelik olarak tasarlanmamıştır.</p>
 
-  <h2>6. Bu politikadaki değişiklikler</h2>
-  <p>Uygulamaya yeni özellikler eklendiğinde (örneğin gelecekte sunulacak abonelik/ödeme sistemi) bu politika güncellenebilir. Güncel sürüm her zaman bu sayfada yayınlanır.</p>
+  <h2>9. Bu politikadaki değişiklikler</h2>
+  <p>Uygulamaya yeni özellikler eklendiğinde bu politika güncellenebilir. Güncel sürüm her zaman bu sayfada yayınlanır.</p>
 
-  <h2>7. İletişim</h2>
+  <h2>10. İletişim</h2>
   <p>Sorularınız için: <a href="mailto:majkasolutionsturkey@gmail.com">majkasolutionsturkey@gmail.com</a></p>
 
   <footer>
-    Garage Book — Majka Solutions tarafından geliştirilmiştir.
+    Garage Book — <a href="https://majkasolutions.com">Majka Solutions</a> tarafından geliştirilmiştir.
   </footer>
 </div>
 </body>

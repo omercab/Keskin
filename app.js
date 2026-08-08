@@ -1965,6 +1965,82 @@ function fillFieldsFromText(cat, text, confidence){
   return {mismatchWarning, confidence};
 }
 
+const GEMINI_PROXY_URL = 'https://garagebook-analyze.vercel.app/api/analyze';
+
+// Yapay zeka destekli belge analizi sadece Pro/Kurumsal üyelere açık — ücretsiz
+// kullanıcılar için mevcut (ücretsiz) Tesseract OCR yolu her zaman geçerli kalıyor.
+function hasAiDocAnalysis(){
+  return hasNativeIAP() && (isProBireysel || !!kurumsalTier);
+}
+
+function applyGeminiFields(cat, f){
+  if(!f) return;
+  if(cat === 'ruhsat'){
+    if(f.plate) document.getElementById('f-plate').value = f.plate;
+    if(f.color){
+      document.getElementById('f-color').value = f.color;
+      document.getElementById('f-color-other-wrap').style.display = 'none';
+    }
+    if(f.vehicleType && VEHICLE_DATA[f.vehicleType]){
+      selectedType = f.vehicleType;
+      renderTypeGrid();
+      populateBrands();
+    }
+    if(f.brand){
+      const brands = Object.keys(VEHICLE_DATA[selectedType] || {});
+      if(brands.includes(f.brand)){
+        document.getElementById('f-brand').value = f.brand;
+        onBrandChange();
+        if(f.model){
+          const models = VEHICLE_DATA[selectedType][f.brand] || [];
+          if(models.includes(f.model)) document.getElementById('f-model').value = f.model;
+        }
+      }
+    }
+    if(f.year) document.getElementById('f-year').value = f.year;
+  } else if(cat === 'sigorta' || cat === 'kasko'){
+    const companySel = document.getElementById('f-' + cat + '-company');
+    const companyOtherWrap = document.getElementById('f-' + cat + '-company-other-wrap');
+    if(f.company){
+      if(INSURANCE_COMPANIES.includes(f.company)){
+        companySel.value = f.company;
+        companyOtherWrap.style.display = 'none';
+      } else {
+        companySel.value = OTHER;
+        companyOtherWrap.style.display = 'block';
+        document.getElementById('f-' + cat + '-company-other').value = f.company;
+      }
+    }
+    if(f.endDate) document.getElementById('f-' + cat).value = f.endDate;
+    if(f.startDate) document.getElementById('f-' + cat + '-start').value = f.startDate;
+    else if(f.endDate) document.getElementById('f-' + cat + '-start').value = addYears(f.endDate, -1);
+    if(f.amount) document.getElementById('f-' + cat + '-amount').value = f.amount;
+  } else if(cat === 'vize'){
+    if(f.date) document.getElementById('f-vize').value = f.date;
+  } else if(cat === 'bakim'){
+    if(f.date) document.getElementById('f-bakim').value = f.date;
+    if(f.amount) document.getElementById('f-bakim-amount').value = f.amount;
+    if(f.note) document.getElementById('f-bakim-note').value = f.note;
+  }
+  if(window.gbRefreshDateButtons) window.gbRefreshDateButtons();
+}
+
+async function runGeminiAndFill(cat, file){
+  const base64 = await readFileAsBase64(file);
+  const res = await fetch(GEMINI_PROXY_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({category: cat, imageBase64: base64, mediaType: file.type}),
+  });
+  if(!res.ok) throw new Error('AI belge analizi başarısız');
+  const data = await res.json();
+  if(!data || !data.fields) throw new Error('AI belge analizi boş sonuç döndü');
+  applyGeminiFields(cat, data.fields);
+  const plate = data.fields.plate || null;
+  const mismatchWarning = (cat === 'sigorta' || cat === 'kasko' || cat === 'bakim' || cat === 'vize') ? checkPlateMismatch(plate) : null;
+  return {mismatchWarning, confidence: 100};
+}
+
 async function handleUpload(cat){
   const input = document.getElementById('f-' + cat + '-file');
   const file = input.files[0];
@@ -1990,7 +2066,7 @@ async function handleUpload(cat){
       statusEl.textContent = 'Belge okunuyor… (ilk seferde biraz uzun sürebilir)';
       showUploadSpinner();
       try{
-        let mismatchWarning, confidence, readAsText = false;
+        let mismatchWarning, confidence, readAsText = false, readWithAi = false;
         if(file.type === 'application/pdf'){
           const pdfText = await extractPdfText(file);
           if(pdfText.replace(/\s+/g, '').length > 40){
@@ -1998,7 +2074,15 @@ async function handleUpload(cat){
             ({mismatchWarning, confidence} = fillFieldsFromText(cat, pdfText, 100));
           }
         }
-        if(!readAsText){
+        if(!readAsText && file.type.startsWith('image/') && hasAiDocAnalysis()){
+          try{
+            ({mismatchWarning, confidence} = await runGeminiAndFill(cat, file));
+            readWithAi = true;
+          }catch(aiErr){
+            console.error('AI belge analizi başarısız, OCR\'a düşülüyor', aiErr);
+          }
+        }
+        if(!readAsText && !readWithAi){
           const rawInput = file.type === 'application/pdf' ? await pdfFirstPageToImageBlob(file) : file;
           const cleanedInput = await preprocessImageForOcr(rawInput);
           ({mismatchWarning, confidence} = await runOcrAndFill(cat, cleanedInput));
@@ -2015,9 +2099,9 @@ async function handleUpload(cat){
           statusEl.className = 'doc-status warn';
           setCardStatus(cat, '⚠ Netlik düşük', 'warn');
         } else {
-          statusEl.textContent = '✓ Belge okundu, bulduklarımı doldurdum — kontrol edip tamamla.';
+          statusEl.textContent = readWithAi ? '✓ Yapay zeka ile okundu, bulduklarımı doldurdum — kontrol edip tamamla.' : '✓ Belge okundu, bulduklarımı doldurdum — kontrol edip tamamla.';
           statusEl.className = 'doc-status ok';
-          setCardStatus(cat, '✓ Okundu', 'ok');
+          setCardStatus(cat, readWithAi ? '✓ AI ile okundu' : '✓ Okundu', 'ok');
         }
       }catch(ocrErr){
         docCardMode[cat] = 'both';
@@ -2501,9 +2585,9 @@ function renderPackagesScreen(){
 
   if(accountType === 'kurumsal'){
     const tiers = [
-      {key:'25', productId: IAP_PRODUCT_IDS.kurumsal25, label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'75', productId: IAP_PRODUCT_IDS.kurumsal75, label:'Kurumsal Standart', price:'1.999 ₺', features:['75 araca kadar kayıt','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar']},
-      {key:'200', productId: IAP_PRODUCT_IDS.kurumsal200, label:'Kurumsal Plus', price:'4.999 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar']},
+      {key:'25', productId: IAP_PRODUCT_IDS.kurumsal25, label:'Kurumsal Başlangıç', price:'899 ₺', features:['25 araca kadar kayıt','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar','Yapay Zeka Destekli Belge Analizi']},
+      {key:'75', productId: IAP_PRODUCT_IDS.kurumsal75, label:'Kurumsal Standart', price:'1.999 ₺', features:['75 araca kadar kayıt','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar','Yapay Zeka Destekli Belge Analizi']},
+      {key:'200', productId: IAP_PRODUCT_IDS.kurumsal200, label:'Kurumsal Plus', price:'4.999 ₺', features:['200 araca kadar kayıt (üst sınır)','Sınırsız belge yükleme','PDF rapor dışa aktarma','Bildirim ve hatırlatmalar','Yapay Zeka Destekli Belge Analizi']},
     ];
     const cardsHtml = tiers.map(t=>{
       const isCurrent = kurumsalTier === t.key;
@@ -2552,7 +2636,7 @@ function renderPackagesScreen(){
           <li>Sınırsız belge yükleme</li>
           <li>PDF rapor dışa aktarma</li>
           <li>Bildirim ve hatırlatmalar</li>
-          <li class="pkg-soon">Yapay Zeka Destekli Belge Analizi (yakında)</li>
+          <li>Yapay Zeka Destekli Belge Analizi</li>
         </ul>
         ${isProBireysel
           ? `<div class="pkg-current">✓ Pro Sürüm Aktif</div><button class="change-mode-link" style="display:block; text-align:center; margin-top:8px;" onclick="openManageSubscriptions()">Aboneliği Yönet / İptal Et</button>`
