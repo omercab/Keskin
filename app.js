@@ -1973,13 +1973,39 @@ function hasAiDocAnalysis(){
   return hasNativeIAP() && (isProBireysel || !!kurumsalTier);
 }
 
+// Belgeler genelde BÜYÜK HARF resmi yazımla geliyor (ör. "PIAGGIO"), bizim
+// listelerimiz ise normal yazım (ör. "Piaggio") kullanıyor — bu yüzden hem marka/renk/
+// firma eşleştirmesi büyük-küçük harf duyarsız, hem de model eşleştirmesi (ör. Gemini
+// "VESPA PRIMAVERA 150 ABS" derken bizim listede sadece "Primavera" olabilir) alt-dize
+// bazlı yapılıyor. Eşleşme bulunamazsa formun zaten var olan "Diğer" serbest metin
+// alanına düşülüyor, veri asla sessizce kaybolmuyor.
+function matchCaseInsensitive(list, value){
+  if(!value) return null;
+  const v = String(value).trim().toLowerCase();
+  return list.find(item => item.toLowerCase() === v) || null;
+}
+function matchFuzzyModel(models, value){
+  if(!value) return null;
+  const v = String(value).trim().toLowerCase();
+  const exact = models.find(m => m.toLowerCase() === v);
+  if(exact) return exact;
+  return models.find(m => v.includes(m.toLowerCase())) || null;
+}
+
 function applyGeminiFields(cat, f){
   if(!f) return;
   if(cat === 'ruhsat'){
     if(f.plate) document.getElementById('f-plate').value = f.plate;
     if(f.color){
-      document.getElementById('f-color').value = f.color;
-      document.getElementById('f-color-other-wrap').style.display = 'none';
+      const colorMatch = matchCaseInsensitive(COLOR_META.map(c=>c.name), f.color);
+      if(colorMatch){
+        document.getElementById('f-color').value = colorMatch;
+        document.getElementById('f-color-other-wrap').style.display = 'none';
+      } else {
+        document.getElementById('f-color').value = OTHER;
+        document.getElementById('f-color-other-wrap').style.display = 'block';
+        document.getElementById('f-color-other').value = f.color;
+      }
     }
     if(f.vehicleType && VEHICLE_DATA[f.vehicleType]){
       selectedType = f.vehicleType;
@@ -1988,13 +2014,28 @@ function applyGeminiFields(cat, f){
     }
     if(f.brand){
       const brands = Object.keys(VEHICLE_DATA[selectedType] || {});
-      if(brands.includes(f.brand)){
-        document.getElementById('f-brand').value = f.brand;
+      const brandMatch = matchCaseInsensitive(brands, f.brand);
+      if(brandMatch){
+        document.getElementById('f-brand').value = brandMatch;
         onBrandChange();
         if(f.model){
-          const models = VEHICLE_DATA[selectedType][f.brand] || [];
-          if(models.includes(f.model)) document.getElementById('f-model').value = f.model;
+          const models = VEHICLE_DATA[selectedType][brandMatch] || [];
+          const modelMatch = matchFuzzyModel(models, f.model);
+          if(modelMatch){
+            document.getElementById('f-model').value = modelMatch;
+          } else {
+            document.getElementById('f-model').value = OTHER;
+            document.getElementById('f-model-other-wrap').style.display = 'block';
+            document.getElementById('f-model-other').value = f.model;
+          }
         }
+      } else {
+        document.getElementById('f-brand').value = OTHER;
+        document.getElementById('f-brand-other-wrap').style.display = 'block';
+        document.getElementById('f-brand-other').value = f.brand;
+        document.getElementById('f-model-wrap').style.display = 'none';
+        document.getElementById('f-model-other-wrap').style.display = 'block';
+        if(f.model) document.getElementById('f-model-other').value = f.model;
       }
     }
     if(f.year) document.getElementById('f-year').value = f.year;
@@ -2002,8 +2043,9 @@ function applyGeminiFields(cat, f){
     const companySel = document.getElementById('f-' + cat + '-company');
     const companyOtherWrap = document.getElementById('f-' + cat + '-company-other-wrap');
     if(f.company){
-      if(INSURANCE_COMPANIES.includes(f.company)){
-        companySel.value = f.company;
+      const companyMatch = matchCaseInsensitive(INSURANCE_COMPANIES, f.company);
+      if(companyMatch){
+        companySel.value = companyMatch;
         companyOtherWrap.style.display = 'none';
       } else {
         companySel.value = OTHER;
