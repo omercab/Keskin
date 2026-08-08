@@ -1979,17 +1979,23 @@ function hasAiDocAnalysis(){
 // "VESPA PRIMAVERA 150 ABS" derken bizim listede sadece "Primavera" olabilir) alt-dize
 // bazlı yapılıyor. Eşleşme bulunamazsa formun zaten var olan "Diğer" serbest metin
 // alanına düşülüyor, veri asla sessizce kaybolmuyor.
-function matchCaseInsensitive(list, value){
+// Plain .toLowerCase() mangles Turkish "İ" into "i" + a combining dot instead of
+// plain "i". Using the Turkish locale instead fixes that but breaks the opposite
+// case: plain ASCII "I" (as in an English loanword brand like "Quick") becomes "ı"
+// under Turkish rules, which then fails to match our own "Quick" spelled with a
+// plain "i". Documents mix both conventions, so fold every I-variant (İ/I/ı) to a
+// plain "i" ourselves before lowercasing — sacrifices the İ/ı distinction, which we
+// don't care about for fuzzy matching, in exchange for matching either convention.
+function trLower(s){ return String(s).trim().replace(/[İIı]/g, 'i').toLowerCase(); }
+// Belgeler (resmi kurum adı, "HDI SİGORTA A.Ş." gibi) bizim kısa listelerimizden
+// ("HDI Sigorta") daha uzun/resmi olabiliyor — exact eşleşme olmazsa iki yönlü
+// alt-dize kontrolü yapılıyor.
+function matchFuzzy(list, value){
   if(!value) return null;
-  const v = String(value).trim().toLowerCase();
-  return list.find(item => item.toLowerCase() === v) || null;
-}
-function matchFuzzyModel(models, value){
-  if(!value) return null;
-  const v = String(value).trim().toLowerCase();
-  const exact = models.find(m => m.toLowerCase() === v);
+  const v = trLower(value);
+  const exact = list.find(item => trLower(item) === v);
   if(exact) return exact;
-  return models.find(m => v.includes(m.toLowerCase())) || null;
+  return list.find(item => v.includes(trLower(item)) || trLower(item).includes(v)) || null;
 }
 
 function applyGeminiFields(cat, f){
@@ -1997,7 +2003,7 @@ function applyGeminiFields(cat, f){
   if(cat === 'ruhsat'){
     if(f.plate) document.getElementById('f-plate').value = f.plate;
     if(f.color){
-      const colorMatch = matchCaseInsensitive(COLOR_META.map(c=>c.name), f.color);
+      const colorMatch = matchFuzzy(COLOR_META.map(c=>c.name), f.color);
       if(colorMatch){
         document.getElementById('f-color').value = colorMatch;
         document.getElementById('f-color-other-wrap').style.display = 'none';
@@ -2014,13 +2020,13 @@ function applyGeminiFields(cat, f){
     }
     if(f.brand){
       const brands = Object.keys(VEHICLE_DATA[selectedType] || {});
-      const brandMatch = matchCaseInsensitive(brands, f.brand);
+      const brandMatch = matchFuzzy(brands, f.brand);
       if(brandMatch){
         document.getElementById('f-brand').value = brandMatch;
         onBrandChange();
         if(f.model){
           const models = VEHICLE_DATA[selectedType][brandMatch] || [];
-          const modelMatch = matchFuzzyModel(models, f.model);
+          const modelMatch = matchFuzzy(models, f.model);
           if(modelMatch){
             document.getElementById('f-model').value = modelMatch;
           } else {
@@ -2043,7 +2049,7 @@ function applyGeminiFields(cat, f){
     const companySel = document.getElementById('f-' + cat + '-company');
     const companyOtherWrap = document.getElementById('f-' + cat + '-company-other-wrap');
     if(f.company){
-      const companyMatch = matchCaseInsensitive(INSURANCE_COMPANIES, f.company);
+      const companyMatch = matchFuzzy(INSURANCE_COMPANIES, f.company);
       if(companyMatch){
         companySel.value = companyMatch;
         companyOtherWrap.style.display = 'none';
@@ -2109,14 +2115,22 @@ async function handleUpload(cat){
       showUploadSpinner();
       try{
         let mismatchWarning, confidence, readAsText = false, readWithAi = false;
-        if(file.type === 'application/pdf'){
+        if(file.type === 'application/pdf' && hasAiDocAnalysis()){
+          try{
+            ({mismatchWarning, confidence} = await runGeminiAndFill(cat, file));
+            readWithAi = true;
+          }catch(aiErr){
+            console.error('AI belge analizi (PDF) başarısız, metin okumaya düşülüyor', aiErr);
+          }
+        }
+        if(!readWithAi && file.type === 'application/pdf'){
           const pdfText = await extractPdfText(file);
           if(pdfText.replace(/\s+/g, '').length > 40){
             readAsText = true;
             ({mismatchWarning, confidence} = fillFieldsFromText(cat, pdfText, 100));
           }
         }
-        if(!readAsText && file.type.startsWith('image/') && hasAiDocAnalysis()){
+        if(!readAsText && !readWithAi && file.type.startsWith('image/') && hasAiDocAnalysis()){
           try{
             ({mismatchWarning, confidence} = await runGeminiAndFill(cat, file));
             readWithAi = true;
