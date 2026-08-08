@@ -385,7 +385,7 @@
         </div>
 
         <div class="doc-card-wrap card-vize" id="docwrap-vize">
-          <div class="doc-card-title"><span>📋 Vize</span><span class="doc-card-status" id="vize-card-status"></span></div>
+          <div class="doc-card-title"><span>📋 Muayene</span><span class="doc-card-status" id="vize-card-status"></span></div>
           <a href="https://www.tuvturk.com.tr" target="_blank" rel="noopener" class="tuvturk-link">📅 Araç Muayene Randevusu Al</a>
           <div class="doc-choose" id="vize-choose">
             <button type="button" class="choose-btn" onclick="chooseUpload('vize')">📎 Belge Yükle</button>
@@ -393,7 +393,7 @@
           </div>
           <div class="doc-upload-block" id="vize-upload-block" style="display:none;">
             <div class="upload-row">
-              <label class="file-label">📎 Vize Belgesi Yükle
+              <label class="file-label">📎 Muayene Belgesi Yükle
                 <input type="file" id="f-vize-file" accept="image/*,application/pdf" onchange="handleUpload('vize')">
               </label>
               <span class="doc-status" id="vize-status"></span>
@@ -444,8 +444,12 @@
               <input type="date" id="f-bakim-next">
             </div>
             <div class="field">
-              <label>Bakım Notu</label>
-              <input type="text" id="f-bakim-note" class="free-text" placeholder="Ör. Yağ ve filtre değişimi">
+              <label>Yapılan İşlemler <span style="font-weight:400; text-transform:none;">(birden fazla seçebilirsin)</span></label>
+              <div class="bakim-items-grid" id="bakimItemsGrid"></div>
+            </div>
+            <div class="field">
+              <label>Bakım Notu <span style="font-weight:400; text-transform:none;">(opsiyonel)</span></label>
+              <input type="text" id="f-bakim-note" class="free-text" placeholder="Ör. Ustanın belirttiği ek detay">
             </div>
             <button type="button" class="change-mode-link" onclick="chooseReset('bakim')">↺ Değiştir</button>
           </div>
@@ -519,11 +523,12 @@
     </div>
     <div class="gb-date-nav">
       <button type="button" id="gbDatePrev" aria-label="Önceki ay">‹</button>
-      <div class="gb-date-month" id="gbDateMonth"></div>
+      <button type="button" class="gb-date-month" id="gbDateMonth"></button>
       <button type="button" id="gbDateNext" aria-label="Sonraki ay">›</button>
     </div>
-    <div class="gb-date-week"><span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span></div>
+    <div class="gb-date-week" id="gbDateWeekRow"><span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span></div>
     <div class="gb-date-grid" id="gbDateGrid"></div>
+    <div class="gb-date-year-grid" id="gbDateYearGrid" style="display:none;"></div>
     <div class="gb-date-actions">
       <button type="button" class="gb-date-clear" id="gbDateClear">Tarihi Temizle</button>
       <button type="button" class="gb-date-done" id="gbDateDone">Tamam</button>

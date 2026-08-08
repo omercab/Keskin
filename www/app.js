@@ -140,49 +140,77 @@ const INSURANCE_COMPANIES = [
 
 const VEHICLE_DATA = {
   otomobil: {
-    'Volkswagen': ['Polo','Golf','Passat','Jetta','T-Roc','Tiguan','Arteon'],
-    'Renault': ['Clio','Megane','Symbol','Taliant','Captur','Austral','Talisman','Fluence'],
-    'Fiat': ['Egea','Egea Cross','500','Panda','Doblo','Tipo','Fiorino'],
-    'Ford': ['Focus','Fiesta','Kuga','Puma','Mondeo','EcoSport','Courier'],
+    'Volkswagen': ['Polo','Golf','Passat','Jetta','T-Roc','T-Cross','Tiguan','Arteon','Caddy','ID.4'],
+    'Renault': ['Clio','Megane','Symbol','Taliant','Captur','Austral','Talisman','Fluence','Kangoo'],
+    'Fiat': ['Egea','Egea Cross','500','Panda','Doblo','Tipo','Fiorino','Fullback'],
+    'Ford': ['Focus','Fiesta','Kuga','Puma','Mondeo','EcoSport','Courier','Ranger','Transit','Tourneo Custom'],
     'Opel': ['Corsa','Astra','Insignia','Mokka','Crossland','Grandland'],
-    'Toyota': ['Corolla','Yaris','C-HR','RAV4','Camry','Auris'],
-    'Hyundai': ['i20','i10','Elantra','Tucson','Accent','Bayon','Kona'],
+    'Toyota': ['Corolla','Corolla Cross','Yaris','C-HR','RAV4','Camry','Auris','Highlander','Proace City'],
+    'Hyundai': ['i20','i10','Elantra','Tucson','Accent','Bayon','Kona','Santa Fe','Ioniq 5','Staria'],
     'Honda': ['Civic','City','CR-V','Jazz','HR-V','Accord'],
-    'Peugeot': ['208','301','308','2008','3008','508'],
-    'Citroën': ['C3','C-Elysée','C4','C5 Aircross','Berlingo'],
-    'Dacia': ['Sandero','Duster','Logan','Jogger','Spring'],
-    'Skoda': ['Fabia','Octavia','Superb','Kamiq','Karoq'],
-    'Nissan': ['Micra','Qashqai','Juke','X-Trail','Sentra'],
-    'Mercedes-Benz': ['A-Serisi','C-Serisi','E-Serisi','CLA','GLA','GLC','S-Serisi'],
-    'BMW': ['1 Serisi','2 Serisi','3 Serisi','5 Serisi','X1','X3','X5'],
-    'Audi': ['A3','A4','A6','Q2','Q3','Q5'],
-    'Kia': ['Picanto','Rio','Ceed','Sportage','Stonic','Niro'],
-    'Seat': ['Ibiza','Leon','Arona','Ateca'],
-    'Mazda': ['Mazda2','Mazda3','CX-5','CX-30'],
+    'Peugeot': ['208','301','308','2008','3008','508','408','5008','Rifter'],
+    'Citroën': ['C3','C-Elysée','C4','C4 X','C5 Aircross','Berlingo','SpaceTourer'],
+    'Dacia': ['Sandero','Duster','Logan','Jogger','Spring','Bigster'],
+    'Skoda': ['Fabia','Octavia','Superb','Kamiq','Karoq','Scala','Enyaq'],
+    'Nissan': ['Micra','Qashqai','Juke','X-Trail','Sentra','Navara','Ariya'],
+    'Mercedes-Benz': ['A-Serisi','C-Serisi','E-Serisi','CLA','GLA','GLB','GLC','GLE','S-Serisi','EQA'],
+    'BMW': ['1 Serisi','2 Serisi','3 Serisi','5 Serisi','7 Serisi','X1','X3','X5','X6','X7','iX'],
+    'Audi': ['A3','A4','A6','Q2','Q3','Q5','Q7','Q8','e-tron'],
+    'Kia': ['Picanto','Rio','Ceed','Sportage','Stonic','Niro','Sorento','EV6','Carens'],
+    'Seat': ['Ibiza','Leon','Arona','Ateca','Tarraco'],
+    'Cupra': ['Leon','Formentor','Born'],
+    'Mazda': ['Mazda2','Mazda3','CX-3','CX-5','CX-30','CX-60'],
     'Mitsubishi': ['Space Star','ASX','Outlander','Lancer'],
-    'Suzuki': ['Swift','Vitara','S-Cross','Baleno'],
+    'Suzuki': ['Swift','Vitara','S-Cross','Baleno','Jimny'],
     'Chevrolet': ['Cruze','Aveo','Spark'],
-    'Volvo': ['S60','S90','XC40','XC60','XC90'],
+    'Volvo': ['S60','S90','V60','V90','XC40','XC60','XC90'],
     'Mini': ['Cooper','Countryman','Clubman'],
-    'Alfa Romeo': ['Giulietta','Giulia','Stelvio'],
+    'Alfa Romeo': ['Giulietta','Giulia','Stelvio','Tonale'],
     'Lexus': ['ES','NX','RX','UX'],
-    'Jaguar': ['XE','XF','F-Pace'],
+    'Jaguar': ['XE','XF','F-Pace','E-Pace'],
     'Subaru': ['Impreza','XV','Forester'],
-    'Porsche': ['911','Cayenne','Macan','Panamera'],
+    'Porsche': ['911','Cayenne','Macan','Panamera','Taycan'],
     'Togg': ['T10X'],
+    'Tesla': ['Model 3','Model Y','Model S','Model X'],
+    'MG': ['MG3','MG5','ZS','HS'],
+    'BYD': ['Atto 3','Seal','Dolphin','Han'],
+    'Chery': ['Tiggo 4 Pro','Tiggo 7 Pro','Tiggo 8 Pro'],
+    'Omoda': ['C5','Jaecoo J7'],
+    'Jetour': ['X70','Dashing'],
+    'Haval': ['Jolion','H6'],
+    'JAC': ['S3','JS4'],
+    'DS': ['DS 3','DS 4','DS 7'],
+    'Smart': ['ForTwo','ForFour'],
+    'Genesis': ['G70','GV70'],
+    'Infiniti': ['Q30','QX70'],
+    'SsangYong / KGM': ['Tivoli','Korando','Torres'],
+    'Maserati': ['Ghibli','Levante'],
+    'Bentley': ['Continental GT','Bentayga'],
+    'Rolls-Royce': ['Ghost','Phantom'],
+    'Ferrari': ['Roma','488'],
+    'Lamborghini': ['Urus','Huracán'],
+    'Aston Martin': ['DB11','Vantage'],
+    'Chrysler': ['300C'],
+    'Dodge': ['Charger'],
+    'Cadillac': ['XT5'],
   },
   arazi: {
-    'Jeep': ['Wrangler','Renegade','Compass','Grand Cherokee'],
-    'Land Rover': ['Defender','Discovery','Range Rover','Range Rover Sport','Range Rover Evoque'],
-    'Toyota': ['Land Cruiser','Land Cruiser Prado','4Runner','Hilux'],
-    'Suzuki': ['Jimny'],
-    'Nissan': ['Patrol','X-Trail'],
+    'Jeep': ['Wrangler','Renegade','Compass','Grand Cherokee','Cherokee'],
+    'Land Rover': ['Defender','Discovery','Discovery Sport','Range Rover','Range Rover Sport','Range Rover Evoque'],
+    'Toyota': ['Land Cruiser','Land Cruiser Prado','4Runner','Hilux','FJ Cruiser'],
+    'Suzuki': ['Jimny','Grand Vitara'],
+    'Nissan': ['Patrol','X-Trail','Terrano'],
     'Mitsubishi': ['Pajero','Pajero Sport','L200'],
     'Lada': ['Niva'],
     'UAZ': ['Patriot','Hunter'],
     'Ford': ['Bronco','Everest','Ranger'],
-    'Mercedes-Benz': ['G-Serisi'],
-    'Isuzu': ['D-Max'],
+    'Mercedes-Benz': ['G-Serisi','GLS'],
+    'Isuzu': ['D-Max','MU-X'],
+    'SsangYong / KGM': ['Rexton','Musso'],
+    'Great Wall': ['Tank 300','Tank 500'],
+    'Chevrolet': ['Trailblazer','Tahoe'],
+    'Dodge': ['Durango'],
+    'Volkswagen': ['Amarok','Touareg'],
   },
   atv: {
     'CFMOTO': ['CForce 450','CForce 520','CForce 625','CForce 1000','ZForce 800'],
@@ -198,17 +226,23 @@ const VEHICLE_DATA = {
     'Adly': ['Terra 300','Terra 500'],
   },
   motor: {
-    'Honda': ['CBR500R','CB650R','PCX150','Africa Twin','Forza','CB125'],
-    'Yamaha': ['MT-07','MT-09','R25','NMAX','Tracer 9','XMAX'],
-    'Kawasaki': ['Ninja 400','Z650','Versys 650','Ninja 650'],
+    'Honda': ['CBR500R','CB650R','PCX150','Africa Twin','Forza','CB125','SH150i','ADV350'],
+    'Yamaha': ['MT-07','MT-09','R25','R1','NMAX','Tracer 9','XMAX','Aerox'],
+    'Kawasaki': ['Ninja 400','Ninja 650','Z650','Z900','Versys 650'],
     'Suzuki': ['GSX-R750','V-Strom 650','Burgman','GSX-S750'],
-    'BMW Motorrad': ['R1250GS','F850GS','S1000RR','F900R'],
+    'BMW Motorrad': ['R1250GS','F850GS','S1000RR','F900R','C400X'],
     'Ducati': ['Monster','Panigale V4','Multistrada','Scrambler'],
     'Harley-Davidson': ['Sportster','Street Glide','Fat Boy','Iron 883'],
     'TVS': ['Apache','Neo'],
     'Bajaj': ['Pulsar','Dominar'],
-    'KTM': ['Duke 390','Adventure 390','RC390'],
-    'Piaggio': ['Primavera','GTS','Sprint'],
+    'KTM': ['Duke 125','Duke 200','Duke 390','Adventure 390','RC390'],
+    'Piaggio': ['Primavera','GTS','Sprint','Beverly','Liberty'],
+    'Vespa': ['Primavera','Sprint','GTS','LX'],
+    'CFMOTO': ['300NK','450NK','700CL-X'],
+    'Royal Enfield': ['Classic 350','Meteor 350','Himalayan'],
+    'Kymco': ['Agility','People S','Xciting'],
+    'SYM': ['Jet 14','Symphony'],
+    'Mondial': ['170 MDF','250 RS','300 K'],
   },
   otobus: {
     'Mercedes-Benz': ['Travego','Tourismo','Sprinter','Citaro'],
@@ -232,6 +266,27 @@ const VEHICLE_DATA = {
     'BMC': ['Pro','Tugra'],
   },
 };
+
+const BAKIM_ITEMS = ['Yağ Değişimi','Yağ Filtresi','Hava Filtresi','Polen Filtresi','Yakıt Filtresi','Fren Balatası','Fren Diski','Fren Hidroliği','Lastik Değişimi','Rotasyon / Balans','Akü','Buji','Triger / Kayış','Antifriz','Silecek','Far Ampulü','Genel Kontrol'];
+let selectedBakimItems = [];
+
+function toggleBakimItem(item){
+  const i = selectedBakimItems.indexOf(item);
+  if(i === -1) selectedBakimItems.push(item); else selectedBakimItems.splice(i,1);
+  renderBakimItemsGrid();
+}
+function renderBakimItemsGrid(){
+  const el = document.getElementById('bakimItemsGrid');
+  if(!el) return;
+  el.innerHTML = BAKIM_ITEMS.map(item=>`<button type="button" class="bakim-item-chip${selectedBakimItems.includes(item)?' selected':''}" onclick="toggleBakimItem('${escapeAttr(item)}')">${escapeHtml(item)}</button>`).join('');
+}
+function bakimSummaryText(bakim){
+  if(!bakim) return null;
+  const items = (bakim.items && bakim.items.length) ? bakim.items.join(', ') : '';
+  const note = bakim.note || '';
+  const combined = [items, note].filter(Boolean).join(' · ');
+  return combined || null;
+}
 
 let pendingDocs = {sigorta:null, bakim:null, vize:null};
 let existingDocs = {sigorta:null, bakim:null, vize:null};
@@ -461,6 +516,7 @@ function normalizeVehicle(v){
   v.sigorta.startDate = v.sigorta.startDate || '';
   v.kasko.startDate = v.kasko.startDate || '';
   v.bakim.nextDate = v.bakim.nextDate || '';
+  v.bakim.items = Array.isArray(v.bakim.items) ? v.bakim.items : [];
   if(typeof v.vize === 'string'){ v.vize = {date:v.vize}; }
   return v;
 }
@@ -532,7 +588,7 @@ function onSummaryYearChange(){
 const STATUS_CAT_META = [
   {key:'sigorta', label:'Trafik Sigortası'},
   {key:'kasko', label:'Kasko'},
-  {key:'vize', label:'Vize'},
+  {key:'vize', label:'Muayene'},
   {key:'bakim', label:'Bakım'},
 ];
 
@@ -545,7 +601,7 @@ function showStatusDetail(level){
     const rows = [
       {cat:'sigorta', label:'Trafik Sigortası', date: v.sigorta.date},
       {cat:'kasko', label:'Kasko', date: v.kasko.date},
-      {cat:'vize', label:'Vize', date: v.vize.date},
+      {cat:'vize', label:'Muayene', date: v.vize.date},
       {cat:'bakim', label:'Bakım', date: v.bakim.nextDate},
     ];
     rows.forEach(r=>{
@@ -726,7 +782,7 @@ const DOC_CAT_META = [
   {key:'ruhsat', label:'Ruhsat'},
   {key:'sigorta', label:'Trafik Sigortası'},
   {key:'kasko', label:'Kasko'},
-  {key:'vize', label:'Vize'},
+  {key:'vize', label:'Muayene'},
   {key:'bakim', label:'Bakım / Servis Belgesi'},
 ];
 
@@ -1016,7 +1072,7 @@ function vehicleHealthScore(v){
 function vehicleTimeline(v){
   const events=[];
   const add=(date,title,copy,icon)=>{if(date) events.push({date,title,copy,icon});};
-  add(v.bakim?.date,'Periyodik bakım',v.bakim?.note || (v.bakim?.amount ? fmtMoney(v.bakim.amount) : 'Bakım kaydı'), '🛠️');
+  add(v.bakim?.date,'Periyodik bakım', bakimSummaryText(v.bakim) || (v.bakim?.amount ? fmtMoney(v.bakim.amount) : 'Bakım kaydı'), '🛠️');
   add(v.sigorta?.startDate,'Trafik sigortası başladı',[v.sigorta?.company,v.sigorta?.amount?fmtMoney(v.sigorta.amount):''].filter(Boolean).join(' · '),'🛡️');
   add(v.kasko?.startDate,'Kasko başladı',[v.kasko?.company,v.kasko?.amount?fmtMoney(v.kasko.amount):''].filter(Boolean).join(' · '),'🔐');
   add(v.vize?.date,'Muayene geçerlilik tarihi','Geçerlilik bitiş tarihi','📋');
@@ -1083,7 +1139,7 @@ function render(){
     grid.innerHTML = `
       <div class="empty">
         <div class="plate-ico">34 XX 000</div>
-        <p>Henüz araç eklenmedi. Sigorta, bakım ve vize tarihlerini takip etmek için ilk aracını ekle.</p>
+        <p>Henüz araç eklenmedi. Sigorta, bakım ve muayene tarihlerini takip etmek için ilk aracını ekle.</p>
       </div>`;
     summary.innerHTML = '';
     return;
@@ -1135,8 +1191,8 @@ function render(){
     const rows = [
       {key:'sigorta', label:'Trafik Sigortası', date:v.sigorta.date, sub: v.sigorta.company},
       {key:'kasko', label:'Kasko', date:v.kasko.date, sub: v.kasko.company},
-      {key:'vize', label:'Vize', date:v.vize.date, sub:null},
-      {key:'bakim', label:'Bakım', date:v.bakim.nextDate, sub: v.bakim.note ? v.bakim.note + (v.bakim.date ? ' · Son bakım: ' + fmtDate(v.bakim.date) : '') : (v.bakim.date ? 'Son bakım: ' + fmtDate(v.bakim.date) : null)}
+      {key:'vize', label:'Muayene', date:v.vize.date, sub:null},
+      {key:'bakim', label:'Bakım', date:v.bakim.nextDate, sub: bakimSummaryText(v.bakim) ? bakimSummaryText(v.bakim) + (v.bakim.date ? ' · Son bakım: ' + fmtDate(v.bakim.date) : '') : (v.bakim.date ? 'Son bakım: ' + fmtDate(v.bakim.date) : null)}
     ];
 
     const rowsHtml = rows.map(row=>{
@@ -1266,6 +1322,8 @@ function openModal(id, focusCat){
     document.getElementById('f-bakim-next').value = v.bakim.nextDate || '';
     document.getElementById('f-bakim-amount').value = v.bakim.amount || '';
     document.getElementById('f-bakim-note').value = v.bakim.note || '';
+    selectedBakimItems = (v.bakim.items || []).slice();
+    renderBakimItemsGrid();
     document.getElementById('f-vize').value = v.vize.date || '';
     document.getElementById('f-note').value = v.note || '';
     deleteBtn.style.display = 'block';
@@ -1351,6 +1409,8 @@ function openModal(id, focusCat){
     document.getElementById('f-bakim-next').value = '';
     document.getElementById('f-bakim-amount').value = '';
     document.getElementById('f-bakim-note').value = '';
+    selectedBakimItems = [];
+    renderBakimItemsGrid();
     document.getElementById('f-vize').value = '';
     document.getElementById('f-note').value = '';
     deleteBtn.style.display = 'none';
@@ -1399,7 +1459,7 @@ const CAT_META_SIMPLE = {
   ruhsat: {icon:'📘', label:'Ruhsat'},
   sigorta: {icon:'🛡️', label:'Trafik Sigortası'},
   kasko: {icon:'🚘', label:'Kasko'},
-  vize: {icon:'📋', label:'Vize'},
+  vize: {icon:'📋', label:'Muayene'},
   bakim: {icon:'🔧', label:'Bakım'},
 };
 
@@ -1451,14 +1511,14 @@ function renderHistory(v){
   const wrap = document.getElementById('historyWrap');
   if(!v.history || v.history.length === 0){ wrap.innerHTML = ''; return; }
   const items = v.history.slice().reverse().map(h=>{
-    const catLabel = h.cat === 'sigorta' ? 'Trafik Sigortası' : h.cat === 'kasko' ? 'Kasko' : h.cat === 'bakim' ? 'Bakım' : 'Vize';
+    const catLabel = h.cat === 'sigorta' ? 'Trafik Sigortası' : h.cat === 'kasko' ? 'Kasko' : h.cat === 'bakim' ? 'Bakım' : 'Muayene';
     let extra = '';
     let dateLabel = fmtDate(h.date);
     if(h.cat === 'sigorta' || h.cat === 'kasko'){
       extra = `${h.company ? h.company + ' · ' : ''}${fmtMoney(h.amount)}`;
       if(h.startDate) dateLabel = `${fmtDate(h.startDate)} → ${fmtDate(h.date)}`;
     }
-    if(h.cat === 'bakim') extra = `${fmtMoney(h.amount)}${h.note ? ' · ' + h.note : ''}`;
+    if(h.cat === 'bakim') extra = `${fmtMoney(h.amount)}${(h.items && h.items.length) ? ' · ' + h.items.join(', ') : ''}${h.note ? ' · ' + h.note : ''}`;
     return `<div class="hist-item">${catLabel} — ${dateLabel} ${extra ? '· ' + extra : ''}</div>`;
   }).join('');
   wrap.innerHTML = `<details class="history"><summary>📜 Geçmiş Kayıtlar (${v.history.length})</summary>${items}</details>`;
@@ -2078,7 +2138,7 @@ async function saveVehicle(){
 
   const newSigorta = {date: document.getElementById('f-sigorta').value, startDate: document.getElementById('f-sigorta-start').value, company: sigortaCompany, amount: document.getElementById('f-sigorta-amount').value};
   const newKasko = {date: document.getElementById('f-kasko').value, startDate: document.getElementById('f-kasko-start').value, company: kaskoCompany, amount: document.getElementById('f-kasko-amount').value};
-  const newBakim = {date: document.getElementById('f-bakim').value, nextDate: document.getElementById('f-bakim-next').value, amount: document.getElementById('f-bakim-amount').value, note: document.getElementById('f-bakim-note').value.trim()};
+  const newBakim = {date: document.getElementById('f-bakim').value, nextDate: document.getElementById('f-bakim-next').value, amount: document.getElementById('f-bakim-amount').value, note: document.getElementById('f-bakim-note').value.trim(), items: selectedBakimItems.slice()};
   const newVize = {date: document.getElementById('f-vize').value};
 
   const data = {
@@ -2092,6 +2152,7 @@ async function saveVehicle(){
     sigorta: newSigorta, kasko: newKasko, bakim: newBakim, vize: newVize,
   };
 
+  const isNewVehicle = !editingId;
   let vehicle;
   let history = [];
   if(editingId){
@@ -2105,7 +2166,7 @@ async function saveVehicle(){
       history.push({cat:'kasko', date: old.kasko.date, startDate: old.kasko.startDate, company: old.kasko.company, amount: old.kasko.amount, archivedAt: new Date().toISOString()});
     }
     if(old.bakim.date && old.bakim.date !== newBakim.date){
-      history.push({cat:'bakim', date: old.bakim.date, nextDate: old.bakim.nextDate, amount: old.bakim.amount, note: old.bakim.note, archivedAt: new Date().toISOString()});
+      history.push({cat:'bakim', date: old.bakim.date, nextDate: old.bakim.nextDate, amount: old.bakim.amount, note: old.bakim.note, items: old.bakim.items, archivedAt: new Date().toISOString()});
     }
     if(old.vize.date && old.vize.date !== newVize.date){
       history.push({cat:'vize', date: old.vize.date, archivedAt: new Date().toISOString()});
@@ -2138,6 +2199,7 @@ async function saveVehicle(){
   await scheduleRemindersForVehicle(vehicle);
   render();
   closeModal();
+  if(isNewVehicle) requestAppReview();
 }
 
 async function deleteVehicle(){
@@ -2237,8 +2299,8 @@ async function generatePdfReport(){
     const rowsData = [
       ['Trafik Sigortasi', `${v.sigorta.company || '-'}${v.sigorta.startDate ? '  |  ' + fmtDate(v.sigorta.startDate) + ' - ' + fmtDate(v.sigorta.date) : '  |  Bitis: ' + fmtDate(v.sigorta.date)}  |  ${fmtMoney(v.sigorta.amount)}`],
       ['Kasko', `${v.kasko.company || '-'}${v.kasko.startDate ? '  |  ' + fmtDate(v.kasko.startDate) + ' - ' + fmtDate(v.kasko.date) : '  |  Bitis: ' + fmtDate(v.kasko.date)}  |  ${fmtMoney(v.kasko.amount)}`],
-      ['Vize', `Bitis: ${fmtDate(v.vize.date)}`],
-      ['Bakim', `Son: ${fmtDate(v.bakim.date)}  |  Sonraki: ${fmtDate(v.bakim.nextDate)}  |  ${fmtMoney(v.bakim.amount)}${v.bakim.note ? '  |  ' + v.bakim.note : ''}`],
+      ['Muayene', `Bitis: ${fmtDate(v.vize.date)}`],
+      ['Bakim', `Son: ${fmtDate(v.bakim.date)}  |  Sonraki: ${fmtDate(v.bakim.nextDate)}  |  ${fmtMoney(v.bakim.amount)}${(v.bakim.items && v.bakim.items.length) ? '  |  ' + v.bakim.items.join(', ') : ''}${v.bakim.note ? '  |  ' + v.bakim.note : ''}`],
     ];
     rowsData.forEach(([label, value])=>{
       doc.setTextColor(muted[0],muted[1],muted[2]); doc.text(label, 16, y);
@@ -2320,6 +2382,17 @@ const IAP_PRODUCT_IDS = {
 
 function hasNativeIAP(){
   return !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.IAPPurchases);
+}
+
+// Apple's native "Puanla ve Değerlendir" sheet (SKStoreReviewController). iOS itself
+// decides whether to actually show it (max ~3x/365 days) — safe to call at any
+// meaningful checkpoint without worrying about over-prompting the user.
+function requestAppReview(){
+  try{
+    if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.InAppReview){
+      window.Capacitor.Plugins.InAppReview.requestReview();
+    }
+  }catch(e){ /* native-only, no-op on web */ }
 }
 
 // Cached live product info (price/name) from StoreKit, keyed by product id.
@@ -2734,7 +2807,7 @@ async function scheduleRemindersForVehicle(v){
   const items = [
     {cat:'sigorta', label:'Trafik Sigortası', date: v.sigorta.date},
     {cat:'kasko', label:'Kasko', date: v.kasko.date},
-    {cat:'vize', label:'Vize', date: v.vize.date},
+    {cat:'vize', label:'Muayene', date: v.vize.date},
     {cat:'bakim', label:'Bakım', date: v.bakim.nextDate},
   ];
   const notifications = [];
@@ -2816,7 +2889,7 @@ async function maybeShowReminderNotification(force){
     const checks = [
       {label:'Trafik Sigortası', date: v.sigorta.date},
       {label:'Kasko', date: v.kasko.date},
-      {label:'Vize', date: v.vize.date},
+      {label:'Muayene', date: v.vize.date},
       {label:'Bakım', date: v.bakim.nextDate},
     ];
     checks.forEach(c=>{
@@ -2836,6 +2909,49 @@ async function maybeShowReminderNotification(force){
 
 checkOnboarding();
 loadDarkModePref();
+checkForAppUpdate();
+
+// Yeni sürüm bildirimi: App Store'daki yayınlı versiyonu yüklü versiyonla karşılaştırır.
+// Not: normal App Store güncellemeleri uygulamayı silip yeniden kurmaz, WKWebView'daki
+// localStorage verisi (araçlar, belgeler) güncelleme sırasında kaybolmaz — bu yüzden
+// ekstra bir "veri yedekle" adımına gerek yok, sadece güncellemeye yönlendirmek yeterli.
+const GB_APP_STORE_ID = '6797319192';
+function compareVersions(a, b){
+  const pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);
+  const len = Math.max(pa.length, pb.length);
+  for(let i=0;i<len;i++){
+    const x = pa[i] || 0, y = pb[i] || 0;
+    if(x > y) return 1;
+    if(x < y) return -1;
+  }
+  return 0;
+}
+function showUpdateBanner(storeUrl){
+  if(document.getElementById('gbUpdateBanner')) return;
+  const el = document.createElement('div');
+  el.id = 'gbUpdateBanner';
+  el.className = 'gb-update-banner';
+  el.innerHTML = '<span>🚀 Yeni bir Garage Book sürümü var</span><div class="gb-update-actions"><button type="button" id="gbUpdateBtn">Güncelle</button><button type="button" id="gbUpdateDismiss" aria-label="Kapat">×</button></div>';
+  document.body.appendChild(el);
+  document.getElementById('gbUpdateBtn').addEventListener('click', ()=>{ window.open(storeUrl, '_blank'); });
+  document.getElementById('gbUpdateDismiss').addEventListener('click', ()=>{ el.remove(); });
+}
+async function checkForAppUpdate(){
+  try{
+    if(!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())) return;
+    if(!(window.Capacitor.Plugins && window.Capacitor.Plugins.App)) return;
+    const info = await window.Capacitor.Plugins.App.getInfo();
+    const installedVersion = info && info.version;
+    if(!installedVersion) return;
+    const res = await fetch('https://itunes.apple.com/lookup?id=' + GB_APP_STORE_ID + '&country=tr&_=' + Date.now());
+    const json = await res.json();
+    const result = json && json.results && json.results[0];
+    if(!result || !result.version) return;
+    if(compareVersions(result.version, installedVersion) > 0){
+      showUpdateBanner(result.trackViewUrl || ('https://apps.apple.com/app/id' + GB_APP_STORE_ID));
+    }
+  }catch(e){ /* güncelleme kontrolü kritik değil, sessizce vazgeç */ }
+}
 
 /* Garage Book v1.5 extension: 200 araç, masraf, galeri, dosya kasası ve etiketler */
 (function(){
@@ -3035,10 +3151,13 @@ loadDarkModePref();
   const trMonths=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
   const backdrop=document.getElementById('gbDateBackdrop');
   const grid=document.getElementById('gbDateGrid');
+  const weekRow=document.getElementById('gbDateWeekRow');
+  const yearGrid=document.getElementById('gbDateYearGrid');
   const monthLabel=document.getElementById('gbDateMonth');
   let activeInput=null;
   let viewDate=new Date();
   let selectedDate=null;
+  const YEAR_MIN=1970, YEAR_MAX=new Date().getFullYear()+1;
 
   function parseISO(v){
     if(!v) return null;
@@ -3079,11 +3198,33 @@ loadDarkModePref();
       grid.appendChild(b);
     }
   }
+  function renderYearGrid(){
+    const activeYear=viewDate.getFullYear();
+    let html='';
+    for(let y=YEAR_MAX;y>=YEAR_MIN;y--){
+      html+=`<button type="button" class="gb-date-year${y===activeYear?' selected':''}" data-year="${y}">${y}</button>`;
+    }
+    yearGrid.innerHTML=html;
+    const activeBtn=yearGrid.querySelector('.gb-date-year.selected');
+    if(activeBtn) activeBtn.scrollIntoView({block:'center'});
+  }
+  function openYearPicker(){
+    renderYearGrid();
+    grid.style.display='none';
+    weekRow.style.display='none';
+    yearGrid.style.display='grid';
+  }
+  function closeYearPicker(){
+    yearGrid.style.display='none';
+    grid.style.display='grid';
+    weekRow.style.display='grid';
+  }
   function openSheet(input){
     activeInput=input;
     selectedDate=parseISO(input.value);
     const base=selectedDate||new Date();
     viewDate=new Date(base.getFullYear(),base.getMonth(),1);
+    closeYearPicker();
     render();
     backdrop.classList.add('open');
     backdrop.setAttribute('aria-hidden','false');
@@ -3111,6 +3252,14 @@ loadDarkModePref();
   function enhanceAll(){document.querySelectorAll('#overlay input[type="date"]').forEach(enhance)}
   document.getElementById('gbDatePrev').addEventListener('click',()=>{viewDate.setMonth(viewDate.getMonth()-1);render()});
   document.getElementById('gbDateNext').addEventListener('click',()=>{viewDate.setMonth(viewDate.getMonth()+1);render()});
+  monthLabel.addEventListener('click',openYearPicker);
+  yearGrid.addEventListener('click',e=>{
+    const btn=e.target.closest('.gb-date-year');
+    if(!btn)return;
+    viewDate=new Date(+btn.dataset.year,viewDate.getMonth(),1);
+    closeYearPicker();
+    render();
+  });
   document.getElementById('gbDateClose').addEventListener('click',closeSheet);
   document.getElementById('gbDateClear').addEventListener('click',()=>{
     if(activeInput){activeInput.value='';activeInput.dispatchEvent(new Event('change',{bubbles:true}));}
